@@ -1,0 +1,28 @@
+{
+  "name": "cookbook-server",
+  "version": "1.0.0",
+  "description": "Backend server for the cookbook app.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThysisCZ/cookbook.git"
+  },
+  "keywords": [
+    "server",
+    "ABL",
+    "DAO"
+  ],
+  "author": "Jiří Kerner",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThysisCZ/cookbook/issues"
+  },
+  "homepage": "https://github.com/ThysisCZ/cookbook#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}
