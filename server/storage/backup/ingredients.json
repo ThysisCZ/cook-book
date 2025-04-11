@@ -1,0 +1,14 @@
+[
+    {
+        "name": "milk",
+        "amountValue": 200,
+        "amountUnit": "ml",
+        "id": "8fd09f3f5e2b4326"
+    },
+    {
+        "name": "meat",
+        "amountValue": 500,
+        "amountUnit": "g",
+        "id": "1e838cb06cfeb01c"
+    }
+]
