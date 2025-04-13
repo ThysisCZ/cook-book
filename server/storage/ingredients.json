@@ -1,14 +1,104 @@
 [
-    {
-        "name": "milk",
-        "amountValue": 200,
-        "amountUnit": "ml",
-        "id": "8fd09f3f5e2b4326"
-    },
-    {
-        "name": "meat",
-        "amountValue": 500,
-        "amountUnit": "g",
-        "id": "1e838cb06cfeb01c"
-    }
+  {
+    "name": "milk",
+    "amountValue": 200,
+    "amountUnit": "ml",
+    "id": "8fd09f3f5e2b4326"
+  },
+  {
+    "name": "meat",
+    "amountValue": 500,
+    "amountUnit": "g",
+    "id": "1e838cb06cfeb01c"
+  },
+  {
+    "name": "salt",
+    "amountValue": 400,
+    "amountUnit": "g",
+    "id": "e6w8en8d5i8j04x8"
+  },
+  {
+    "name": "ham",
+    "amountValue": 200,
+    "amountUnit": "g",
+    "id": "z5mad9geia0uiozf"
+  },
+  {
+    "name": "cheese",
+    "amountValue": 300,
+    "amountUnit": "g",
+    "id": "apm3a1oh1pghypqv"
+  },
+  {
+    "name": "pepper",
+    "amountValue": 600,
+    "amountUnit": "g",
+    "id": "xq1y5z3mofhcvxcw"
+  },
+  {
+    "name": "oil",
+    "amountValue": 400,
+    "amountUnit": "ml",
+    "id": "31c5qdlsiizqw275"
+  },
+  {
+    "name": "potatoe",
+    "amountValue": 3,
+    "amountUnit": "kg",
+    "id": "g4bbt411c7orsrz8"
+  },
+  {
+    "name": "chilli pepper",
+    "amountValue": 100,
+    "amountUnit": "g",
+    "id": "07442ce646a7112c"
+  },
+  {
+    "name": "flour",
+    "amountValue": 3,
+    "amountUnit": "g",
+    "id": "22d63efe5cfff71f"
+  },
+  {
+    "name": "honey",
+    "amountValue": 0.75,
+    "amountUnit": "c",
+    "id": "38d82d473942c44a"
+  },
+  {
+    "name": "butter",
+    "amountValue": 200,
+    "amountUnit": "g",
+    "id": "df639c57cda23e9b"
+  },
+  {
+    "name": "ham",
+    "amountValue": 300,
+    "amountUnit": "g",
+    "id": "ccd7bb6c1c736949"
+  },
+  {
+    "name": "lemonade",
+    "amountValue": 3,
+    "amountUnit": "l",
+    "id": "f8be9f7bbea1719e"
+  },
+  {
+    "name": "juice",
+    "amountValue": 2,
+    "amountUnit": "l",
+    "id": "e1bf068b50eb64bd"
+  },
+  {
+    "name": "cocoa",
+    "amountValue": 200,
+    "amountUnit": "g",
+    "id": "52af58f83d3cd19c"
+  },
+  {
+    "name": "lettuce",
+    "amountValue": 300,
+    "amountUnit": "g",
+    "id": "b5e7eb64fbea986c"
+  }
 ]

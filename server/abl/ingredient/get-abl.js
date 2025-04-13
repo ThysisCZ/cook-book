@@ -1,7 +1,7 @@
 //dependencies and initialization
 const path = require('path'); //module for file path work
 const Ajv = require('ajv').default; //module for JSON schema validation
-const IngredientDao = require("../../dao/ingredient-dao"); //imports ingredientsDao class
+const IngredientDao = require('../../dao/ingredient-dao'); //imports ingredientsDao class
 let dao = new IngredientDao( //creates a new instance of IngredientsDao class
     path.join(__dirname, "..", "..", "storage", "ingredients.json")
 );
@@ -12,7 +12,7 @@ let schema = {
     properties: {
         id: { type: "string" },
     },
-    required: ["id"],
+    required: ["id"]
 };
 
 //asynchronous function - handles HTTP request for retrieving ingredient by ID
@@ -32,7 +32,7 @@ async function GetAbl(req, res) {
             res.json(ingredient); //send back ingredient JSON object
         } else { //dtoIn is not valid
             res.status(400).send({
-                errorMessage: "validation of input failed",
+                errorMessage: "Validation of dtoIn failed.",
                 params: body,
                 reason: ajv.errors,
             });

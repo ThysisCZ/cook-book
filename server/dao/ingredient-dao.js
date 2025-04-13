@@ -23,6 +23,19 @@ class IngredientsDao {
         return result;
     }
 
+    async listIngredients() {
+        let ingredientList = await this._loadAllIngredients();
+        return ingredientList;
+    }
+
+    async createIngredient(ingredient) {
+        let ingredientList = await this._loadAllIngredients();
+        ingredient.id = crypto.randomBytes(8).toString("hex");
+        ingredientList.push(ingredient);
+        await wf(this._getStorageLocation(), JSON.stringify(ingredientList, null, 2));
+        return ingredient;
+    }
+
     //private helper method - reads ingredient data from JSON
     async _loadAllIngredients() {
         let ingredientList;
