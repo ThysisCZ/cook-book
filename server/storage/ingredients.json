@@ -81,24 +81,24 @@
     "name": "lemonade",
     "amountValue": 3,
     "amountUnit": "l",
-    "id": "f8be9f7bbea1719e"
+    "id": "05265395c4676bb1"
   },
   {
     "name": "juice",
     "amountValue": 2,
     "amountUnit": "l",
-    "id": "e1bf068b50eb64bd"
+    "id": "6527b56bf683c835"
   },
   {
     "name": "cocoa",
     "amountValue": 200,
     "amountUnit": "g",
-    "id": "52af58f83d3cd19c"
+    "id": "1e28d50f33c11b31"
   },
   {
     "name": "lettuce",
     "amountValue": 300,
     "amountUnit": "g",
-    "id": "b5e7eb64fbea986c"
+    "id": "1e31df609d772344"
   }
 ]

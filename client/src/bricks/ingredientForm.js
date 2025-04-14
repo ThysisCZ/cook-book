@@ -32,7 +32,7 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
         e.preventDefault();
         e.stopPropagation();
 
-        if (!form.checkValidity() || formData.amountValue === null) {
+        if (!form.checkValidity()) {
             setValidated(true);
             return;
         }
@@ -97,10 +97,7 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
                             <Form.Control
                                 type="number"
                                 value={formData.amountValue}
-                                onChange={(e) => {
-                                    let value = e.target.value;
-                                    setField("amountValue", value === "" ? null : parseFloat(value));
-                                }}
+                                onChange={(e) => { setField("amountValue", parseFloat(e.target.value)); }}
                                 onBlur={(e) => {
                                     let value = e.target.value;
                                     if (value.length > 7) {
@@ -108,18 +105,15 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
                                         setField("amountValue", parseFloat(e.target.value));
                                     }
                                 }}
-                                min={0.00001}
-                                max={9999999}
-                                step={0.00001}
+                                min={0.001}
+                                step={0.001}
                                 required
-                                isInvalid={formData.amountValue !== null &&
-                                    (formData.amountValue < 0.00001 || formData.amountValue > 9999999)
-                                }
+                                isInvalid={formData.amountValue < 0.001 && formData.amountValue !== null}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Input a valid number
                                 <br></br>
-                                (0.00001—9999999)
+                                (0.001—9999999)
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group as={Col} className="mb-3">
@@ -131,10 +125,10 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
                                 isInvalid={!formData.amountUnit}
                             >
                                 <option value={"ml"}>ml</option>
-                                <option value={"l"}>l</option>
                                 <option value={"dl"}>dl</option>
-                                <option value={"mg"}>mg</option>
+                                <option value={"l"}>l</option>
                                 <option value={"g"}>g</option>
+                                <option value={"mg"}>dkg</option>
                                 <option value={"kg"}>kg</option>
                                 <option value={"tsp"}>tsp</option>
                                 <option value={"tbsp"}>tbsp</option>

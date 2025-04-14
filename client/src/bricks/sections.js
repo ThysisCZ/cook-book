@@ -9,10 +9,8 @@ function Sections() {
     const [reload, setReload] = useState(false);
 
     const [addIngredientShow, setAddIngredientShow] = useState(false);
-    const [ingredient, setIngredient] = useState(null);
 
     const handleAddIngredientShow = () => {
-        setIngredient(null);
         setAddIngredientShow(true);
     };
 
@@ -95,7 +93,6 @@ function Sections() {
             </Accordion>
 
             <IngredientForm
-                ingredient={ingredient}
                 show={addIngredientShow}
                 setAddIngredientShow={setAddIngredientShow}
                 setReload={setReload}
