@@ -1,9 +1,9 @@
 import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onComplete }) {
+function IngredientForm({ show, setAddIngredientShow, reload, setReload, onComplete, ingredientListCall, setIngredientListCall }) {
     const defaultForm = {
         name: "",
         amountValue: null,
@@ -12,9 +12,31 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
 
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(defaultForm);
-    const [addIngredientCall, setAddIngredientCall] = useState({
-        state: 'inactive'
-    });
+    const [addIngredientCall, setAddIngredientCall] = useState({ state: 'inactive' });
+
+    const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
+
+    useEffect(() => {
+        async function fetchIngredients() {
+            setIngredientListCall({ state: "pending" });
+
+            try {
+                const res = await fetch("http://localhost:8000/ingredient/list");
+                const data = await res.json();
+
+                if (res.status >= 400) {
+                    setIngredientListCall({ state: "error", error: data });
+                } else {
+                    setIngredientListCall({ state: "success", data });
+                }
+            } catch (err) {
+                setIngredientListCall({ state: "error", error: err.message });
+            }
+        }
+
+        fetchIngredients();
+        setReload(false);
+    }, [reload, setReload, setIngredientListCall]);
 
     const handleClose = () => {
         setFormData(defaultForm);
@@ -32,7 +54,9 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
         e.preventDefault();
         e.stopPropagation();
 
-        if (!form.checkValidity()) {
+        const isDuplicate = ingredientList.find((ing) => ing.name === formData.name);
+
+        if (!form.checkValidity() || isDuplicate) {
             setValidated(true);
             return;
         }
@@ -77,23 +101,34 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
-                        <Form.Label>Name</Form.Label>
+                        <Form.Label>Name<span style={{ color: "red" }}> *</span></Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.name}
-                            onChange={(e) => setField("name", e.target.value)}
+                            onChange={(e) => {
+                                setField("name", e.target.value);
+                                const isDuplicate = ingredientList.find(
+                                    (ing) => ing.name === e.target.value
+                                );
+                                e.target.setCustomValidity(isDuplicate ? "Duplicate" : "");
+                            }}
                             maxLength={20}
                             required
-                            isInvalid={formData.name.length > 20}
+                            isInvalid={
+                                (validated && formData.name.length === 0) ||
+                                ingredientList.find((ing) => ing.name === formData.name)
+                            }
                         />
                         <Form.Control.Feedback type="invalid">
-                            This field is required
+                            {validated && formData.name.length === 0 && "This field is required"}
+                            {ingredientList.find((ing) => ing.name === formData.name)
+                                && "This ingredient already exists"}
                         </Form.Control.Feedback>
                     </Form.Group>
 
                     <Row>
                         <Form.Group as={Col} className="mb-3">
-                            <Form.Label>Amount value</Form.Label>
+                            <Form.Label>Amount value<span style={{ color: "red" }}> *</span></Form.Label>
                             <Form.Control
                                 type="number"
                                 value={formData.amountValue}
@@ -108,16 +143,16 @@ function IngredientForm({ ingredient, show, setAddIngredientShow, setReload, onC
                                 min={0.001}
                                 step={0.001}
                                 required
-                                isInvalid={formData.amountValue < 0.001 && formData.amountValue !== null}
+                                isInvalid={validated && formData.amountValue < 0.001}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Input a valid number
                                 <br></br>
-                                (0.001—9999999)
+                                (0,001—9999999)
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group as={Col} className="mb-3">
-                            <Form.Label>Amount unit</Form.Label>
+                            <Form.Label>Amount unit<span style={{ color: "red" }}> *</span></Form.Label>
                             <Form.Select
                                 value={formData.amountUnit}
                                 onChange={(e) => setField("amountUnit", e.target.value)}

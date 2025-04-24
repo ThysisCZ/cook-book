@@ -66,8 +66,11 @@ function IngredientSection() {
             <IngredientForm
                 show={addIngredientShow}
                 setAddIngredientShow={setAddIngredientShow}
+                reload={reload}
                 setReload={setReload}
                 onComplete={(ingredient) => handleIngredientAdded(ingredient)}
+                ingredientListCall={ingredientListCall}
+                setIngredientListCall={setIngredientListCall}
             />
         </>
     );
