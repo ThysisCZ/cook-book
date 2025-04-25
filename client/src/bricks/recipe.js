@@ -1,0 +1,55 @@
+import { React, useState } from 'react';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+
+function Recipe(props) {
+    const [recipeDetailShow, setRecipeDetailShow] = useState(false);
+    const ingredientList = props.ingredientListCall.state === "success" ? props.ingredientListCall.data : [];
+
+    const handleRecipeDetailShow = () => {
+        setRecipeDetailShow(true);
+    };
+
+    const imageUrl = `http://localhost:8000/images/${props.recipe.image}`;
+
+    return (
+        <Card>
+            <Card.Body>
+                <div className="Align-left" style={{ fontWeight: "bold" }}>
+                    {props.recipe.name}
+                </div>
+
+                <div>
+                    <span className="Align-right" style={{ marginRight: 24 }}>
+                        <img src={imageUrl} alt={props.recipe.image} style={{ width: "150px", height: "auto" }}></img>
+                    </span>
+                    <span className="Align-left" style={{ marginBottom: 6 }}>
+                        <Button variant="success" onClick={handleRecipeDetailShow}>
+                            Detail
+                        </Button>
+                    </span>
+                </div>
+
+                <div className="Align-left" style={{ fontWeight: "bold" }}>
+                    Ingredients:
+                </div>
+
+                <div>
+                    {props.recipe.requiredIngredients.map((reqIng) => {
+                        const match = ingredientList.find((favIng) => favIng.id === reqIng.id);
+
+                        return (
+                            <div key={reqIng.id} className="d-flex justify-content-between">
+                                {match.name} {" "}
+                                ({reqIng.requiredAmountValue} {reqIng.requiredAmountUnit}), {" "}
+                                {match.amountValue} {match.amountUnit} available
+                            </div>
+                        );
+                    })}
+                </div>
+            </Card.Body>
+        </Card>
+    );
+}
+
+export default Recipe;

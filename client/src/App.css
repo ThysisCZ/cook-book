@@ -29,8 +29,20 @@
   padding-right: 20px;
 }
 
-.Ingredient-form-button {
+.Show-form-button {
   padding-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.Align-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Align-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;

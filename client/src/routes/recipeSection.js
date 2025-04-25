@@ -1,13 +1,66 @@
+import RecipeList from '../bricks/recipeList';
+import Button from 'react-bootstrap/Button';
+import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
+
 function RecipeSection() {
+    const { ingredientListCall } = useOutletContext();
+    const [recipeListCall, setRecipeListCall] = useState({ state: "pending" });
+    const [addRecipeShow, setAddRecipeShow] = useState(false);
+
+    useEffect(() => {
+        async function fetchRecipes() {
+            setRecipeListCall({ state: "pending" });
+
+            try {
+                const res = await fetch("http://localhost:8000/recipe/list");
+                const data = await res.json();
+
+                if (res.status >= 400) {
+                    setRecipeListCall({ state: "error", error: data });
+                } else {
+                    setRecipeListCall({ state: "success", data });
+                }
+            } catch (err) {
+                setRecipeListCall({ state: "error", error: err.message });
+            }
+        }
+
+        fetchRecipes();
+    }, []);
+
+    const handleAddRecipeShow = () => {
+        setAddRecipeShow(true);
+    };
+
+    const handleRecipeAdded = (recipe) => {
+        if (recipeListCall.state === "success") {
+            setRecipeListCall({
+                state: "success",
+                data: [...recipeListCall.data, recipe]
+            });
+        }
+    };
+
     return (
         <>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-            minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+            <div className="Show-form-button">
+                <Button variant="success" onClick={handleAddRecipeShow}>
+                    Create
+                </Button>
+            </div>
+            <div>
+                {recipeListCall.state === "pending" && <p>Loading...</p>}
+                {recipeListCall.state === "error" && (
+                    <p>{recipeListCall.error}</p>
+                )}
+                {recipeListCall.state === "success" && recipeListCall.data.length > 0 && (
+                    <RecipeList recipeList={recipeListCall.data} ingredientListCall={ingredientListCall} />
+                )}
+                {recipeListCall.state === "success" && recipeListCall.data.length === 0 && (
+                    <p>There are no recipes.</p>
+                )}
+            </div>
         </>
     );
 }

@@ -1,8 +1,8 @@
 [
     {
-        "name": "Bread with ham",
-        "image": " ",
-        "preparationProcess": " ",
+        "name": "Ham sandwich",
+        "preparationProcess": "The ham sandwich is a common type of sandwich. The bread may be fresh or toasted, and it can be made with a variety of toppings including cheese and vegetables like lettuce, tomato, onion or pickle slices. Various kinds of mustard and mayonnaise are also common.\nThe main components of a ham sandwich, sliced bread, sliced cheese, and sliced cooked ham are readily available in Western supermarkets. As a result, they are a common component of packed lunches due to their ease of preparation and consumption.",
+        "image": "ham-sandwich.jpg",
         "requiredIngredients": [
             {
                 "id": "e6d3880dac3c1bc4",
@@ -11,6 +11,11 @@
             },
             {
                 "id": "ccd7bb6c1c736949",
+                "requiredAmountValue": 20,
+                "requiredAmountUnit": "g"
+            },
+            {
+                "id": "1e31df609d772344",
                 "requiredAmountValue": 20,
                 "requiredAmountUnit": "g"
             }

@@ -8,6 +8,7 @@ function Ingredient(props) {
                 <div style={{ textAlign: "center", fontWeight: "bold" }}>
                     {props.ingredient.name}
                 </div>
+
                 <div>
                     Amount: {" "} {props.ingredient.amountValue} {" "}
                     {props.ingredient.amountUnit}

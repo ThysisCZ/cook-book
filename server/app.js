@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const app = express();
 const port = 8000;
@@ -15,11 +16,14 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
-//add ingredient routes to the app
+//ingredient endpoint
 app.use("/ingredient", ingredientRouter);
 
-//add recipe routes to the app
+//recipe endpoint
 app.use("/recipe", recipeRouter);
+
+//endpoint for images
+app.use('/images', express.static(path.join(__dirname, 'script/images')));
 
 app.listen(port, () => {
     console.log(`Server is running on port http://localhost:${port}`);

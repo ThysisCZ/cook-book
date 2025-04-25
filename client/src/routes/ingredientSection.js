@@ -1,32 +1,12 @@
 import IngredientList from '../bricks/ingredientList';
 import Button from 'react-bootstrap/Button';
 import IngredientForm from '../bricks/ingredientForm';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 function IngredientSection() {
-    const [ingredientListCall, setIngredientListCall] = useState({ state: "pending" });
+    const { ingredientListCall, setIngredientListCall } = useOutletContext();
     const [addIngredientShow, setAddIngredientShow] = useState(false);
-
-    useEffect(() => {
-        async function fetchIngredients() {
-            setIngredientListCall({ state: "pending" });
-
-            try {
-                const res = await fetch("http://localhost:8000/ingredient/list");
-                const data = await res.json();
-
-                if (res.status >= 400) {
-                    setIngredientListCall({ state: "error", error: data });
-                } else {
-                    setIngredientListCall({ state: "success", data });
-                }
-            } catch (err) {
-                setIngredientListCall({ state: "error", error: err.message });
-            }
-        }
-
-        fetchIngredients();
-    }, []);
 
     const handleAddIngredientShow = () => {
         setAddIngredientShow(true);
@@ -43,7 +23,7 @@ function IngredientSection() {
 
     return (
         <>
-            <div className="Ingredient-form-button">
+            <div className="Show-form-button">
                 <Button variant="success" onClick={handleAddIngredientShow}>
                     Create
                 </Button>

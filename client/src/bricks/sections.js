@@ -1,7 +1,7 @@
 import Accordion from 'react-bootstrap/Accordion';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
-function Sections() {
+function Sections({ ingredientListCall, setIngredientListCall }) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -28,7 +28,7 @@ function Sections() {
                 </Accordion.Header>
                 {activeSection === "recipes" && (
                     <Accordion.Body>
-                        <Outlet />
+                        <Outlet context={{ ingredientListCall, setIngredientListCall }} />
                     </Accordion.Body>
                 )}
             </Accordion.Item>
@@ -47,7 +47,7 @@ function Sections() {
                 </Accordion.Header>
                 {activeSection === "ingredients" && (
                     <Accordion.Body>
-                        <Outlet />
+                        <Outlet context={{ ingredientListCall, setIngredientListCall }} />
                     </Accordion.Body>
                 )}
             </Accordion.Item>
