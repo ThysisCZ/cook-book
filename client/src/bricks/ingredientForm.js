@@ -3,7 +3,7 @@ import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
 import { useState, useEffect } from 'react';
 
-function IngredientForm({ show, setAddIngredientShow, reload, setReload, onComplete, ingredientListCall, setIngredientListCall }) {
+function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientListCall, setIngredientListCall }) {
     const defaultForm = {
         name: "",
         amountValue: null,
@@ -12,7 +12,7 @@ function IngredientForm({ show, setAddIngredientShow, reload, setReload, onCompl
 
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(defaultForm);
-    const [addIngredientCall, setAddIngredientCall] = useState({ state: 'inactive' });
+    const [addIngredientCall, setAddIngredientCall] = useState({ state: "inactive" });
 
     const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
 
@@ -35,8 +35,7 @@ function IngredientForm({ show, setAddIngredientShow, reload, setReload, onCompl
         }
 
         fetchIngredients();
-        setReload(false);
-    }, [reload, setReload, setIngredientListCall]);
+    }, [setIngredientListCall]);
 
     const handleClose = () => {
         setFormData(defaultForm);
@@ -82,11 +81,8 @@ function IngredientForm({ show, setAddIngredientShow, reload, setReload, onCompl
                 setAddIngredientCall({ state: "error", error: data });
             } else {
                 setAddIngredientCall({ state: "success", data });
-                if (typeof onComplete === "function") {
-                    onComplete(data.ingredient);
-                }
+                onComplete(data.ingredient);
                 handleClose();
-                setReload(true);
             }
         } catch (err) {
             setAddIngredientCall({ state: "error", error: { errorMessage: err.message } });

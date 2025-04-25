@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Bread with ham",
+        "image": " ",
+        "preparationProcess": " ",
+        "requiredIngredients": [
+            {
+                "id": "e6d3880dac3c1bc4",
+                "requiredAmountValue": 200,
+                "requiredAmountUnit": "g"
+            },
+            {
+                "id": "ccd7bb6c1c736949",
+                "requiredAmountValue": 20,
+                "requiredAmountUnit": "g"
+            }
+        ],
+        "id": "c7d919e21158d143"
+    }
+]

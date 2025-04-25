@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 
 function IngredientSection() {
     const [ingredientListCall, setIngredientListCall] = useState({ state: "pending" });
-    const [reload, setReload] = useState(false);
     const [addIngredientShow, setAddIngredientShow] = useState(false);
 
     useEffect(() => {
@@ -27,8 +26,7 @@ function IngredientSection() {
         }
 
         fetchIngredients();
-        setReload(false);
-    }, [reload]);
+    }, []);
 
     const handleAddIngredientShow = () => {
         setAddIngredientShow(true);
@@ -66,8 +64,6 @@ function IngredientSection() {
             <IngredientForm
                 show={addIngredientShow}
                 setAddIngredientShow={setAddIngredientShow}
-                reload={reload}
-                setReload={setReload}
                 onComplete={(ingredient) => handleIngredientAdded(ingredient)}
                 ingredientListCall={ingredientListCall}
                 setIngredientListCall={setIngredientListCall}

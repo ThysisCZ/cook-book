@@ -4,6 +4,7 @@ const app = express();
 const port = 8000;
 
 const ingredientRouter = require('./controller/ingredient-controller'); //import router for ingredients
+const recipeRouter = require('./controller/recipe-controller'); //import router for recipes
 
 //middleware configuration
 app.use(express.json());
@@ -16,6 +17,9 @@ app.get("/", (req, res) => {
 
 //add ingredient routes to the app
 app.use("/ingredient", ingredientRouter);
+
+//add recipe routes to the app
+app.use("/recipe", recipeRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port http://localhost:${port}`);

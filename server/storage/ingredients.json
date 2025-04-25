@@ -106,5 +106,23 @@
     "amountValue": 300,
     "amountUnit": "g",
     "id": "608354d3bdd48eee"
+  },
+  {
+    "name": "bread",
+    "amountValue": 400,
+    "amountUnit": "g",
+    "id": "e6d3880dac3c1bc4"
+  },
+  {
+    "name": "coconut",
+    "amountValue": 3,
+    "amountUnit": "kg",
+    "id": "0b422e6df4920086"
+  },
+  {
+    "name": "chilli pepper",
+    "amountValue": 100,
+    "amountUnit": "g",
+    "id": "61d2c3bca9a32862"
   }
 ]
