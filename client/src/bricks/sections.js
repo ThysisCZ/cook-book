@@ -1,7 +1,8 @@
 import Accordion from 'react-bootstrap/Accordion';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
-function Sections({ ingredientListCall, setIngredientListCall }) {
+function Sections() {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -10,6 +11,29 @@ function Sections({ ingredientListCall, setIngredientListCall }) {
         if (location.pathname.includes("ingredientSection")) return "ingredients";
         return null;
     })();
+
+    const [ingredientListCall, setIngredientListCall] = useState({ state: "pending" });
+
+    useEffect(() => {
+        async function fetchIngredients() {
+            setIngredientListCall({ state: "pending" });
+
+            try {
+                const res = await fetch("http://localhost:8000/ingredient/list");
+                const data = await res.json();
+
+                if (res.status >= 400) {
+                    setIngredientListCall({ state: "error", error: data });
+                } else {
+                    setIngredientListCall({ state: "success", data });
+                }
+            } catch (err) {
+                setIngredientListCall({ state: "error", error: err.message });
+            }
+        }
+
+        fetchIngredients();
+    }, []);
 
     return (
         <Accordion activeKey={activeSection}>
@@ -28,7 +52,7 @@ function Sections({ ingredientListCall, setIngredientListCall }) {
                 </Accordion.Header>
                 {activeSection === "recipes" && (
                     <Accordion.Body>
-                        <Outlet context={{ ingredientListCall, setIngredientListCall }} />
+                        <Outlet context={{ ingredientListCall }} />
                     </Accordion.Body>
                 )}
             </Accordion.Item>
