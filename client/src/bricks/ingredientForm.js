@@ -171,7 +171,6 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                                 <option value={"lb"}>lb</option>
                                 <option value={"oz"}>oz</option>
                             </Form.Select>
-
                             <Form.Control.Feedback type="invalid">
                                 This field is required
                             </Form.Control.Feedback>

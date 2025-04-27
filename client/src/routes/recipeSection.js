@@ -1,5 +1,6 @@
 import RecipeList from '../bricks/recipeList';
 import Button from 'react-bootstrap/Button';
+import RecipeForm from '../bricks/recipeForm'
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
@@ -61,6 +62,14 @@ function RecipeSection() {
                     <p>There are no recipes.</p>
                 )}
             </div>
+
+            <RecipeForm
+                show={addRecipeShow}
+                setAddRecipeShow={setAddRecipeShow}
+                onComplete={(recipe) => handleRecipeAdded(recipe)}
+                recipeListCall={recipeListCall}
+                setRecipeListCall={setRecipeListCall}
+            />
         </>
     );
 }
