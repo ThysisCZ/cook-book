@@ -2,9 +2,9 @@ import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
 import { FileUpload } from 'primereact/fileupload';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, setRecipeListCall }) {
+function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingredientListCall }) {
     const defaultForm = {
         name: "",
         image: "",
@@ -21,29 +21,10 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, setRec
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(defaultForm);
     const [addRecipeCall, setAddRecipeCall] = useState({ state: "inactive" });
+    const [invalidFile, setInvalidFile] = useState(false);
 
     const recipeList = recipeListCall.state === "success" ? recipeListCall.data : [];
-
-    useEffect(() => {
-        async function fetchRecipes() {
-            setRecipeListCall({ state: "pending" });
-
-            try {
-                const res = await fetch("http://localhost:8000/recipe/list");
-                const data = await res.json();
-
-                if (res.status >= 400) {
-                    setRecipeListCall({ state: "error", error: data });
-                } else {
-                    setRecipeListCall({ state: "success", data });
-                }
-            } catch (err) {
-                setRecipeListCall({ state: "error", error: err.message });
-            }
-        }
-
-        fetchRecipes();
-    }, [setRecipeListCall]);
+    const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
 
     const handleClose = () => {
         setFormData(defaultForm);
@@ -97,6 +78,18 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, setRec
         }
     };
 
+    const handleNewRow = () => {
+        const updatedIngredients = [...formData.requiredIngredients, {
+            id: "",
+            requiredAmountValue: null,
+            requiredAmountUnit: "g"
+        }];
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            requiredIngredients: updatedIngredients
+        }));
+    }
+
     return (
         <Modal show={show} onHide={handleClose}>
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -120,12 +113,12 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, setRec
                             required
                             isInvalid={
                                 (validated && formData.name.length === 0) ||
-                                recipeList.find((rec) => rec.name === formData.name)
+                                (validated && recipeList.find((rec) => rec.name === formData.name))
                             }
                         />
                         <Form.Control.Feedback type="invalid">
                             {validated && formData.name.length === 0 && "This field is required"}
-                            {recipeList.find((rec) => rec.name === formData.name)
+                            {validated && recipeList.find((rec) => rec.name === formData.name)
                                 && "This recipe already exists"}
                         </Form.Control.Feedback>
                     </Form.Group>
@@ -134,18 +127,35 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, setRec
                         <div>
                             <Button variant="success">
                                 <FileUpload
-                                    name="fileUpload"
+                                    name="image"
                                     mode="basic"
-                                    chooseLabel="Upload"
-                                    url="/images"
+                                    chooseLabel={formData.image || "Upload"}
+                                    url="http://localhost:8000/images"
                                     accept="image/*"
                                     maxFileSize={730000}
-                                    onSelect={(e) => setField("image", e.files[0])}
+                                    auto={true}
+                                    onUpload={(e) => {
+                                        const response = e.xhr.response ? JSON.parse(e.xhr.response) : {};
+                                        if (response.filename) {
+                                            setField("image", response.filename);
+                                            setInvalidFile(false);
+                                        }
+                                    }}
+                                    onSelect={(e) => {
+                                        const file = e.files[0];
+                                        if (file) {
+                                            if (!file.type.startsWith("image/")) {
+                                                setField("image", "");
+                                                setInvalidFile(true);
+                                            }
+                                        }
+                                    }}
                                 />
                             </Button>
                         </div>
                         <div className="Invalid-feedback">
-                            {validated && !formData.image && "Please upload an image"}
+                            {validated && !formData.image && !invalidFile && "Please upload an image"}
+                            {validated && !formData.image && invalidFile && "File must be an image"}
                         </div>
                     </Form.Group>
                     <Form.Group as={Col} className="mb-3">
@@ -166,78 +176,116 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, setRec
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Required ingredients<span style={{ color: "red" }}> *</span></Form.Label>
                         <Row>
-                            <Form.Group as={Col} className="mb-3">
-                                <Form.Label style={{ width: 200 }}>Name<span style={{ color: "red" }}> *</span></Form.Label>
-                                <Form.Select
-                                    style={{ width: 219 }}
-                                    value={formData.requiredIngredients[0].id}
-                                    onChange={(e) => setField("id", e.target.value)}
-                                    required
-                                    isInvalid={validated && !formData.requiredIngredients[0].id}
-                                >
-                                    <option value={""}></option>
-                                </Form.Select>
-                                <Form.Control.Feedback type="invalid">
-                                    There are no ingredients
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group as={Col} className="mb-3">
-                                <Form.Label>Value<span style={{ color: "red" }}> *</span></Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    value={formData.requiredIngredients[0].requiredAmountValue}
-                                    onChange={(e) => { setField("requiredAmountValue", parseFloat(e.target.value)); }}
-                                    onBlur={(e) => {
-                                        let value = e.target.value;
-                                        if (value.length > 7) {
-                                            e.target.value = value.slice(0, 7);
-                                            setField("requiredAmountValue", parseFloat(e.target.value));
-                                        }
-                                    }}
-                                    min={0.001}
-                                    step={0.001}
-                                    required
-                                    isInvalid={validated && formData.amountValue < 0.001}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    Input a valid number
-                                    <br></br>
-                                    (0,001—9999999)
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group as={Col} className="mb-3">
-                                <Form.Label>Unit<span style={{ color: "red" }}> *</span></Form.Label>
-                                <Form.Select
-                                    value={formData.requiredIngredients[0].requiredAmountUnit}
-                                    onChange={(e) => {
-                                        const updatedIngredients = [...formData.requiredIngredients];
-                                        updatedIngredients[0].requiredAmountUnit = e.target.value;
-                                        setField("requiredAmountUnit", e.target.value);
-                                    }}
-                                    required
-                                    isInvalid={validated && !formData.requiredIngredients[0].requiredAmountUnit}
-                                >
-                                    <option value={"ml"}>ml</option>
-                                    <option value={"dl"}>dl</option>
-                                    <option value={"l"}>l</option>
-                                    <option value={"g"}>g</option>
-                                    <option value={"mg"}>dkg</option>
-                                    <option value={"kg"}>kg</option>
-                                    <option value={"tsp"}>tsp</option>
-                                    <option value={"tbsp"}>tbsp</option>
-                                    <option value={"fl oz"}>fl oz</option>
-                                    <option value={"c"}>c</option>
-                                    <option value={"pt"}>pt</option>
-                                    <option value={"qt"}>qt</option>
-                                    <option value={"gal"}>gal</option>
-                                    <option value={"lb"}>lb</option>
-                                    <option value={"oz"}>oz</option>
-                                </Form.Select>
-                                <Form.Control.Feedback type="invalid">
-                                    This field is required
-                                </Form.Control.Feedback>
+                            <Form.Group as={Col} className="mb-3" style={{ height: 16 }}>
+                                <Form.Label style={{ width: 243 }}>
+                                    Name<span style={{ color: "red" }}> *</span>
+                                </Form.Label>
+
+                                <Form.Label style={{ width: 123.83 }}>
+                                    Value<span style={{ color: "red" }}> *</span>
+                                </Form.Label>
+
+                                <Form.Label style={{ width: 99.83 }}>
+                                    Unit<span style={{ color: "red" }}> *</span>
+                                </Form.Label>
                             </Form.Group>
                         </Row>
+                        {formData.requiredIngredients.map((ing, idx) => (
+                            <Row key={idx}>
+                                <Form.Group as={Col} className="mb-3">
+                                    <Form.Select
+                                        style={{ width: 219 }}
+                                        value={ing.id}
+                                        onChange={(e) => {
+                                            const updatedIngredients = [...formData.requiredIngredients];
+                                            updatedIngredients[idx].id = e.target.value;
+                                            setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                        }}
+                                        required
+                                        isInvalid={validated && !formData.requiredIngredients[0].id}
+                                    >
+                                        <option value={""}>Select an ingredient</option>
+
+                                        {ingredientList.map((ing) => {
+                                            const name = ing.name;
+                                            const id = ing.id;
+
+                                            return (
+                                                <option value={id}>{name}</option>
+                                            );
+                                        })}
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        No ingredient selected
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col} className="mb-3">
+                                    <Form.Control
+                                        type="number"
+                                        value={ing.requiredAmountValue}
+                                        onChange={(e) => {
+                                            const updatedIngredients = [...formData.requiredIngredients];
+                                            updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
+                                            setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                        }}
+                                        onBlur={(e) => {
+                                            let value = e.target.value;
+                                            if (value.length > 7) {
+                                                e.target.value = value.slice(0, 7);
+                                                const updatedIngredients = [...formData.requiredIngredients];
+                                                updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
+                                                setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                            }
+                                        }}
+                                        min={0.001}
+                                        step={0.001}
+                                        required
+                                        isInvalid={validated && formData.amountValue < 0.001}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Input a valid number
+                                        <br></br>
+                                        (0,001—9999999)
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col} className="mb-3">
+                                    <Form.Select
+                                        value={formData.requiredIngredients[idx].requiredAmountUnit}
+                                        onChange={(e) => {
+                                            const updatedIngredients = [...formData.requiredIngredients];
+                                            updatedIngredients[idx].requiredAmountUnit = e.target.value;
+                                            setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                        }}
+                                        required
+                                        isInvalid={validated && !formData.requiredIngredients[idx].requiredAmountUnit}
+                                    >
+                                        <option value={"ml"}>ml</option>
+                                        <option value={"dl"}>dl</option>
+                                        <option value={"l"}>l</option>
+                                        <option value={"g"}>g</option>
+                                        <option value={"dkg"}>dkg</option>
+                                        <option value={"kg"}>kg</option>
+                                        <option value={"tsp"}>tsp</option>
+                                        <option value={"tbsp"}>tbsp</option>
+                                        <option value={"fl oz"}>fl oz</option>
+                                        <option value={"c"}>c</option>
+                                        <option value={"pt"}>pt</option>
+                                        <option value={"qt"}>qt</option>
+                                        <option value={"gal"}>gal</option>
+                                        <option value={"lb"}>lb</option>
+                                        <option value={"oz"}>oz</option>
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        This field is required
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+                        ))}
+                        <div className="Align-center">
+                            <Button variant="success" onClick={handleNewRow} >
+                                New ingredient
+                            </Button>
+                        </div>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>

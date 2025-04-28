@@ -55,8 +55,8 @@
   },
   {
     "name": "flour",
-    "amountValue": 3,
-    "amountUnit": "g",
+    "amountValue": 2,
+    "amountUnit": "kg",
     "id": "22d63efe5cfff71f"
   },
   {
@@ -120,9 +120,21 @@
     "id": "0b422e6df4920086"
   },
   {
-    "name": "chilli pepper",
-    "amountValue": 100,
-    "amountUnit": "g",
-    "id": "61d2c3bca9a32862"
+    "name": "macaroni noodles",
+    "amountValue": 0.5,
+    "amountUnit": "kg",
+    "id": "8a25b0ec478b39c7"
+  },
+  {
+    "name": "sirup",
+    "amountValue": 0.5,
+    "amountUnit": "l",
+    "id": "3b266971d430de18"
+  },
+  {
+    "name": "ice cream",
+    "amountValue": 20,
+    "amountUnit": "dkg",
+    "id": "97db46b0ec3d5680"
   }
 ]

@@ -68,7 +68,7 @@ function RecipeSection() {
                 setAddRecipeShow={setAddRecipeShow}
                 onComplete={(recipe) => handleRecipeAdded(recipe)}
                 recipeListCall={recipeListCall}
-                setRecipeListCall={setRecipeListCall}
+                ingredientListCall={ingredientListCall}
             />
         </>
     );

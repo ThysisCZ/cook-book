@@ -1,9 +1,9 @@
 import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientListCall, setIngredientListCall }) {
+function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientListCall }) {
     const defaultForm = {
         name: "",
         amountValue: null,
@@ -15,27 +15,6 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
     const [addIngredientCall, setAddIngredientCall] = useState({ state: "inactive" });
 
     const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
-
-    useEffect(() => {
-        async function fetchIngredients() {
-            setIngredientListCall({ state: "pending" });
-
-            try {
-                const res = await fetch("http://localhost:8000/ingredient/list");
-                const data = await res.json();
-
-                if (res.status >= 400) {
-                    setIngredientListCall({ state: "error", error: data });
-                } else {
-                    setIngredientListCall({ state: "success", data });
-                }
-            } catch (err) {
-                setIngredientListCall({ state: "error", error: err.message });
-            }
-        }
-
-        fetchIngredients();
-    }, [setIngredientListCall]);
 
     const handleClose = () => {
         setFormData(defaultForm);
@@ -112,12 +91,12 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                             required
                             isInvalid={
                                 (validated && formData.name.length === 0) ||
-                                ingredientList.find((ing) => ing.name === formData.name)
+                                (validated && ingredientList.find((ing) => ing.name === formData.name))
                             }
                         />
                         <Form.Control.Feedback type="invalid">
                             {validated && formData.name.length === 0 && "This field is required"}
-                            {ingredientList.find((ing) => ing.name === formData.name)
+                            {validated && ingredientList.find((ing) => ing.name === formData.name)
                                 && "This ingredient already exists"}
                         </Form.Control.Feedback>
                     </Form.Group>
@@ -159,7 +138,7 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                                 <option value={"dl"}>dl</option>
                                 <option value={"l"}>l</option>
                                 <option value={"g"}>g</option>
-                                <option value={"mg"}>dkg</option>
+                                <option value={"dkg"}>dkg</option>
                                 <option value={"kg"}>kg</option>
                                 <option value={"tsp"}>tsp</option>
                                 <option value={"tbsp"}>tbsp</option>
