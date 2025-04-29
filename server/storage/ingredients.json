@@ -133,7 +133,7 @@
   },
   {
     "name": "ice cream",
-    "amountValue": 20,
+    "amountValue": 0,
     "amountUnit": "dkg",
     "id": "97db46b0ec3d5680"
   }

@@ -1,81 +1,81 @@
 [
-    {
-        "name": "Ham sandwich",
-        "preparationProcess": "The ham sandwich is a common type of sandwich. The bread may be fresh or toasted, and it can be made with a variety of toppings including cheese and vegetables like lettuce, tomato, onion or pickle slices. Various kinds of mustard and mayonnaise are also common.\nThe main components of a ham sandwich, sliced bread, sliced cheese, and sliced cooked ham are readily available in Western supermarkets. As a result, they are a common component of packed lunches due to their ease of preparation and consumption.",
-        "image": "ham-sandwich.jpg",
-        "requiredIngredients": [
-            {
-                "id": "e6d3880dac3c1bc4",
-                "requiredAmountValue": 200,
-                "requiredAmountUnit": "g"
-            },
-            {
-                "id": "ccd7bb6c1c736949",
-                "requiredAmountValue": 20,
-                "requiredAmountUnit": "g"
-            },
-            {
-                "id": "1e31df609d772344",
-                "requiredAmountValue": 20,
-                "requiredAmountUnit": "g"
-            }
-        ],
-        "id": "c7d919e21158d143"
-    },
-    {
-        "name": "Mac & cheese",
-        "image": "mac-and-cheese.jpg",
-        "preparationProcess": "Cook the macaroni. Boil the macaroni for 2 minutes less than the package instructions for al dente because they will continue to cook in the oven.\n\nMake the cheese sauce. Cook flour in melted butter until golden, whisk in milk or half-and-half, bring the sauce to a boil, and cook until thickened. Remove from heat and whisk in shredded cheese.\n\nLayer with more cheese. Pour half of the mac and cheese into a baking dish, add a layer of shredded cheese, top with the remaining mac and cheese, and finish with even more cheese. \n\nBake the mac and cheese. Bake just until bubbling around the edges and the cheese melts and turns golden-brown in spots.",
-        "requiredIngredients": [
-            {
-                "id": "8fd09f3f5e2b4326",
-                "requiredAmountValue": 300,
-                "requiredAmountUnit": "ml"
-            },
-            {
-                "id": "8a25b0ec478b39c7",
-                "requiredAmountValue": 0.5,
-                "requiredAmountUnit": "kg"
-            },
-            {
-                "id": "df639c57cda23e9b",
-                "requiredAmountValue": 100,
-                "requiredAmountUnit": "g"
-            },
-            {
-                "id": "22d63efe5cfff71f",
-                "requiredAmountValue": 200,
-                "requiredAmountUnit": "g"
-            },
-            {
-                "id": "apm3a1oh1pghypqv",
-                "requiredAmountValue": 100,
-                "requiredAmountUnit": "g"
-            }
-        ],
-        "id": "d70ca473c9b704ce"
-    },
-    {
-        "name": "Milkshake",
-        "image": "milkshake.jpg",
-        "preparationProcess": "Soften the ice cream and chill the glass. Take the ice cream out of the freezer for 10 to 15 minutes before use. ...\n\nMeasure the ingredients. 1 cup ice cream to 1/4 cup milk is a great ratio.\n\nBlend the shake. In a blender, combine the milk and ice cream and blend until smooth. ...\n\nServe.",
-        "requiredIngredients": [
-            {
-                "id": "8fd09f3f5e2b4326",
-                "requiredAmountValue": 300,
-                "requiredAmountUnit": "ml"
-            },
-            {
-                "id": "97db46b0ec3d5680",
-                "requiredAmountValue": 10,
-                "requiredAmountUnit": "dkg"
-            },
-            {
-                "id": "3b266971d430de18",
-                "requiredAmountValue": 200,
-                "requiredAmountUnit": "ml"
-            }
-        ],
-        "id": "aafd13a59072c7bc"
-    }
+  {
+    "name": "Ham sandwich",
+    "preparationProcess": "The ham sandwich is a common type of sandwich. The bread may be fresh or toasted, and it can be made with a variety of toppings including cheese and vegetables like lettuce, tomato, onion or pickle slices. Various kinds of mustard and mayonnaise are also common.\nThe main components of a ham sandwich, sliced bread, sliced cheese, and sliced cooked ham are readily available in Western supermarkets. As a result, they are a common component of packed lunches due to their ease of preparation and consumption.",
+    "image": "ham-sandwich.jpg",
+    "requiredIngredients": [
+      {
+        "id": "e6d3880dac3c1bc4",
+        "requiredAmountValue": 200,
+        "requiredAmountUnit": "g"
+      },
+      {
+        "id": "ccd7bb6c1c736949",
+        "requiredAmountValue": 20,
+        "requiredAmountUnit": "g"
+      },
+      {
+        "id": "1e31df609d772344",
+        "requiredAmountValue": 20,
+        "requiredAmountUnit": "g"
+      }
+    ],
+    "id": "c7d919e21158d143"
+  },
+  {
+    "name": "Mac & cheese",
+    "image": "mac-and-cheese.jpg",
+    "preparationProcess": "Cook the macaroni. Boil the macaroni for 2 minutes less than the package instructions for al dente because they will continue to cook in the oven.\n\nMake the cheese sauce. Cook flour in melted butter until golden, whisk in milk or half-and-half, bring the sauce to a boil, and cook until thickened. Remove from heat and whisk in shredded cheese.\n\nLayer with more cheese. Pour half of the mac and cheese into a baking dish, add a layer of shredded cheese, top with the remaining mac and cheese, and finish with even more cheese. \n\nBake the mac and cheese. Bake just until bubbling around the edges and the cheese melts and turns golden-brown in spots.",
+    "requiredIngredients": [
+      {
+        "id": "8fd09f3f5e2b4326",
+        "requiredAmountValue": 300,
+        "requiredAmountUnit": "ml"
+      },
+      {
+        "id": "8a25b0ec478b39c7",
+        "requiredAmountValue": 0.5,
+        "requiredAmountUnit": "kg"
+      },
+      {
+        "id": "df639c57cda23e9b",
+        "requiredAmountValue": 100,
+        "requiredAmountUnit": "g"
+      },
+      {
+        "id": "22d63efe5cfff71f",
+        "requiredAmountValue": 200,
+        "requiredAmountUnit": "g"
+      },
+      {
+        "id": "apm3a1oh1pghypqv",
+        "requiredAmountValue": 100,
+        "requiredAmountUnit": "g"
+      }
+    ],
+    "id": "d70ca473c9b704ce"
+  },
+  {
+    "name": "Milkshake",
+    "image": "milkshake.jpg",
+    "preparationProcess": "Soften the ice cream and chill the glass. Take the ice cream out of the freezer for 10 to 15 minutes before use. ...\n\nMeasure the ingredients. 1 cup ice cream to 1/4 cup milk is a great ratio.\n\nBlend the shake. In a blender, combine the milk and ice cream and blend until smooth. ...\n\nServe.",
+    "requiredIngredients": [
+      {
+        "id": "8fd09f3f5e2b4326",
+        "requiredAmountValue": 300,
+        "requiredAmountUnit": "ml"
+      },
+      {
+        "id": "97db46b0ec3d5680",
+        "requiredAmountValue": 10,
+        "requiredAmountUnit": "dkg"
+      },
+      {
+        "id": "3b266971d430de18",
+        "requiredAmountValue": 200,
+        "requiredAmountUnit": "ml"
+      }
+    ],
+    "id": "aafd13a59072c7bc"
+  }
 ]

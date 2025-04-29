@@ -60,3 +60,9 @@
   font-size: .875em;
   color: #dc3545;
 }
+
+.Preparation-container {
+  width: 467px;
+  max-width: 100%;
+  height: 100px
+}

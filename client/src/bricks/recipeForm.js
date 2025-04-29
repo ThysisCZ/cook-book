@@ -90,6 +90,12 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
         }));
     }
 
+    const handleAmountUpdate = (e, idx) => {
+        const updatedIngredients = [...formData.requiredIngredients];
+        updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
+        setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+    }
+
     return (
         <Modal show={show} onHide={handleClose}>
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -162,7 +168,7 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                         <Form.Label>Preparation process<span style={{ color: "red" }}> *</span></Form.Label>
                         <textarea
                             name="preparationProcess"
-                            style={{ width: 467, height: 100 }}
+                            className="Preparation-container"
                             value={formData.preparationProcess}
                             onChange={(e) => setField("preparationProcess", e.target.value)}
                             maxLength={4000}
@@ -175,17 +181,21 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                     </Form.Group>
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Required ingredients<span style={{ color: "red" }}> *</span></Form.Label>
-                        <Row>
-                            <Form.Group as={Col} className="mb-3" style={{ height: 16 }}>
-                                <Form.Label style={{ width: 243 }}>
+                        <Row style={{ height: 32 }}>
+                            <Form.Group as={Col} className="mb-3">
+                                <Form.Label>
                                     Name<span style={{ color: "red" }}> *</span>
                                 </Form.Label>
+                            </Form.Group>
 
-                                <Form.Label style={{ width: 123.83 }}>
+                            <Form.Group as={Col} className="mb-3">
+                                <Form.Label>
                                     Value<span style={{ color: "red" }}> *</span>
                                 </Form.Label>
+                            </Form.Group>
 
-                                <Form.Label style={{ width: 99.83 }}>
+                            <Form.Group as={Col} className="mb-3">
+                                <Form.Label>
                                     Unit<span style={{ color: "red" }}> *</span>
                                 </Form.Label>
                             </Form.Group>
@@ -194,7 +204,6 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                             <Row key={idx}>
                                 <Form.Group as={Col} className="mb-3">
                                     <Form.Select
-                                        style={{ width: 219 }}
                                         value={ing.id}
                                         onChange={(e) => {
                                             const updatedIngredients = [...formData.requiredIngredients];
@@ -202,7 +211,7 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                                             setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
                                         }}
                                         required
-                                        isInvalid={validated && !formData.requiredIngredients[0].id}
+                                        isInvalid={validated && !formData.requiredIngredients[idx].id}
                                     >
                                         <option value={""}>Select an ingredient</option>
 
@@ -222,25 +231,21 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                                 <Form.Group as={Col} className="mb-3">
                                     <Form.Control
                                         type="number"
-                                        value={ing.requiredAmountValue}
+                                        value={formData.requiredIngredients[idx].requiredAmountValue}
                                         onChange={(e) => {
-                                            const updatedIngredients = [...formData.requiredIngredients];
-                                            updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
-                                            setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                            handleAmountUpdate(e, idx);
                                         }}
                                         onBlur={(e) => {
                                             let value = e.target.value;
                                             if (value.length > 7) {
                                                 e.target.value = value.slice(0, 7);
-                                                const updatedIngredients = [...formData.requiredIngredients];
-                                                updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
-                                                setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                                handleAmountUpdate(e, idx);
                                             }
                                         }}
                                         min={0.001}
                                         step={0.001}
                                         required
-                                        isInvalid={validated && formData.amountValue < 0.001}
+                                        isInvalid={validated && !formData.requiredIngredients[idx].requiredAmountValue}
                                     />
                                     <Form.Control.Feedback type="invalid">
                                         Input a valid number

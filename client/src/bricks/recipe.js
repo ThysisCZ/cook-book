@@ -40,9 +40,15 @@ function Recipe(props) {
 
                         return (
                             <div key={reqIng.id} className="d-flex justify-content-between">
-                                {match.name} {" "}
-                                ({reqIng.requiredAmountValue} {reqIng.requiredAmountUnit}), {" "}
-                                {match.amountValue} {match.amountUnit} available
+                                <span>{match.name}</span>
+                                <br></br>
+                                <>{reqIng.requiredAmountValue} {reqIng.requiredAmountUnit} required</>
+                                <br></br>
+                                {match.amountValue !== 0 ? (
+                                    <>{match.amountValue} {match.amountUnit} available</>
+                                ) : (
+                                    <>unavailable</>
+                                )}
                             </div>
                         );
                     })}
