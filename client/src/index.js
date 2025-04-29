@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from "react-router-dom"; //import route components
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Home from "./routes/home";
 import IngredientSection from './routes/ingredientSection';
 import RecipeSection from './routes/recipeSection';
+import RecipeDetail from './routes/recipeDetail';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -18,6 +19,7 @@ root.render(
             <Route path="ingredientSection" element={<IngredientSection />} />
             <Route path="recipeSection" element={<RecipeSection />} />
           </Route>
+          <Route path="recipe/:id" element={<RecipeDetail />} />
         </Route>
       </Routes>
     </BrowserRouter>

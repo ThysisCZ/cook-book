@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import RecipeForm from '../bricks/recipeForm'
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 function RecipeSection() {
     const { ingredientListCall } = useOutletContext();
@@ -70,6 +71,8 @@ function RecipeSection() {
                 recipeListCall={recipeListCall}
                 ingredientListCall={ingredientListCall}
             />
+
+            <Outlet />
         </>
     );
 }

@@ -1,16 +1,12 @@
-import { React, useState } from 'react';
+import { React } from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
 
 function Recipe(props) {
-    const [recipeDetailShow, setRecipeDetailShow] = useState(false);
     const ingredientList = props.ingredientListCall.state === "success" ? props.ingredientListCall.data : [];
-
-    const handleRecipeDetailShow = () => {
-        setRecipeDetailShow(true);
-    };
-
     const imageUrl = `http://localhost:8000/images/${props.recipe.image}`;
+    const navigate = useNavigate();
 
     return (
         <Card>
@@ -24,7 +20,7 @@ function Recipe(props) {
                         <img src={imageUrl} alt={props.recipe.image} style={{ width: "150px", height: "auto" }}></img>
                     </span>
                     <span className="Align-left" style={{ marginBottom: 6 }}>
-                        <Button variant="success" onClick={handleRecipeDetailShow}>
+                        <Button variant="success" onClick={() => navigate(`/recipe/${props.recipe.id}`)}>
                             Detail
                         </Button>
                     </span>
@@ -37,6 +33,7 @@ function Recipe(props) {
                 <div>
                     {props.recipe.requiredIngredients.map((reqIng) => {
                         const match = ingredientList.find((favIng) => favIng.id === reqIng.id);
+                        if (!match) return null;
 
                         return (
                             <div key={reqIng.id} className="d-flex justify-content-between">

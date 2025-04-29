@@ -203,27 +203,29 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                         {formData.requiredIngredients.map((ing, idx) => (
                             <Row key={idx}>
                                 <Form.Group as={Col} className="mb-3">
-                                    <Form.Select
-                                        value={ing.id}
-                                        onChange={(e) => {
-                                            const updatedIngredients = [...formData.requiredIngredients];
-                                            updatedIngredients[idx].id = e.target.value;
-                                            setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
-                                        }}
-                                        required
-                                        isInvalid={validated && !formData.requiredIngredients[idx].id}
-                                    >
-                                        <option value={""}>Select an ingredient</option>
+                                    <div>
+                                        <Form.Select
+                                            value={ing.id}
+                                            onChange={(e) => {
+                                                const updatedIngredients = [...formData.requiredIngredients];
+                                                updatedIngredients[idx].id = e.target.value;
+                                                setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                            }}
+                                            required
+                                            isInvalid={validated && !formData.requiredIngredients[idx].id}
+                                        >
+                                            <option value={""}>Select an ingredient</option>
 
-                                        {ingredientList.map((ing) => {
-                                            const name = ing.name;
-                                            const id = ing.id;
+                                            {ingredientList.map((ing) => {
+                                                const name = ing.name;
+                                                const id = ing.id;
 
-                                            return (
-                                                <option value={id}>{name}</option>
-                                            );
-                                        })}
-                                    </Form.Select>
+                                                return (
+                                                    <option value={id}>{name}</option>
+                                                );
+                                            })}
+                                        </Form.Select>
+                                    </div>
                                     <Form.Control.Feedback type="invalid">
                                         No ingredient selected
                                     </Form.Control.Feedback>
