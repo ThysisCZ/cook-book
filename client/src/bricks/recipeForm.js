@@ -79,17 +79,20 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
     };
 
     const handleNewRow = () => {
+        //create a new row by taking all required ingredients data and add a default object to them
         const updatedIngredients = [...formData.requiredIngredients, {
             id: "",
             requiredAmountValue: null,
             requiredAmountUnit: "g"
         }];
+        //update the form with new row
         setFormData((prevFormData) => ({
             ...prevFormData,
             requiredIngredients: updatedIngredients
         }));
     }
 
+    //function that removes duplicit code in onChange and onBlur events in amount value field
     const handleAmountUpdate = (e, idx) => {
         const updatedIngredients = [...formData.requiredIngredients];
         updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
@@ -203,29 +206,27 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                         {formData.requiredIngredients.map((ing, idx) => (
                             <Row key={idx}>
                                 <Form.Group as={Col} className="mb-3">
-                                    <div>
-                                        <Form.Select
-                                            value={ing.id}
-                                            onChange={(e) => {
-                                                const updatedIngredients = [...formData.requiredIngredients];
-                                                updatedIngredients[idx].id = e.target.value;
-                                                setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
-                                            }}
-                                            required
-                                            isInvalid={validated && !formData.requiredIngredients[idx].id}
-                                        >
-                                            <option value={""}>Select an ingredient</option>
+                                    <Form.Select
+                                        value={ing.id}
+                                        onChange={(e) => {
+                                            const updatedIngredients = [...formData.requiredIngredients];
+                                            updatedIngredients[idx].id = e.target.value;
+                                            setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+                                        }}
+                                        required
+                                        isInvalid={validated && !formData.requiredIngredients[idx].id}
+                                    >
+                                        <option value={""}>Select an ingredient</option>
 
-                                            {ingredientList.map((ing) => {
-                                                const name = ing.name;
-                                                const id = ing.id;
+                                        {ingredientList.map((ing) => {
+                                            const name = ing.name;
+                                            const id = ing.id;
 
-                                                return (
-                                                    <option value={id}>{name}</option>
-                                                );
-                                            })}
-                                        </Form.Select>
-                                    </div>
+                                            return (
+                                                <option value={id}>{name}</option>
+                                            );
+                                        })}
+                                    </Form.Select>
                                     <Form.Control.Feedback type="invalid">
                                         No ingredient selected
                                     </Form.Control.Feedback>
@@ -298,7 +299,7 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                 <Modal.Footer>
                     <div className="d-flex flex-row justify-content-between align-items-center w-100">
                         <div>
-                            {addRecipeCall.state === 'error' &&
+                            {addRecipeCall.state === "error" &&
                                 <div className="text-danger">Error: {addRecipeCall.error.errorMessage}</div>
                             }
                         </div>
@@ -306,8 +307,8 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                             <Button variant="secondary" onClick={handleClose}>
                                 Cancel
                             </Button>
-                            <Button variant="primary" type="submit" disabled={addRecipeCall.state === 'pending'}>
-                                {addRecipeCall.state === 'pending' ? (
+                            <Button variant="primary" type="submit" disabled={addRecipeCall.state === "pending"}>
+                                {addRecipeCall.state === "pending" ? (
                                     <Icon size={0.8} path={mdiLoading} spin={true} />
                                 ) : (
                                     "Create"

@@ -100,7 +100,6 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                                 && "This ingredient already exists"}
                         </Form.Control.Feedback>
                     </Form.Group>
-
                     <Row>
                         <Form.Group as={Col} className="mb-3">
                             <Form.Label>Amount value<span style={{ color: "red" }}> *</span></Form.Label>
@@ -159,7 +158,7 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                 <Modal.Footer>
                     <div className="d-flex flex-row justify-content-between align-items-center w-100">
                         <div>
-                            {addIngredientCall.state === 'error' &&
+                            {addIngredientCall.state === "error" &&
                                 <div className="text-danger">Error: {addIngredientCall.error.errorMessage}</div>
                             }
                         </div>
@@ -168,7 +167,7 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                                 Cancel
                             </Button>
                             <Button variant="primary" type="submit" disabled={addIngredientCall.state === 'pending'}>
-                                {addIngredientCall.state === 'pending' ? (
+                                {addIngredientCall.state === "pending" ? (
                                     <Icon size={0.8} path={mdiLoading} spin={true} />
                                 ) : (
                                     "Create"

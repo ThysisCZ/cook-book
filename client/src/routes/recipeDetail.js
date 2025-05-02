@@ -30,7 +30,7 @@ function RecipeDetail() {
         switch (recipeLoadCall.state) {
             case "pending":
                 return (
-                    <div className="text-center p-4">
+                    <div className="Align-center">
                         <Icon size={2} path={mdiLoading} spin={true} />
                         <p>Loading recipe...</p>
                     </div>
@@ -43,7 +43,7 @@ function RecipeDetail() {
                                 <h1 className="Align-center">
                                     {recipeLoadCall.data.name}
                                 </h1>
-                                <h3>Preparation Process:</h3>
+                                <h3>Preparation process:</h3>
                                 <p style={{ textAlign: "justify" }}>
                                     {recipeLoadCall.data.preparationProcess}
                                 </p>

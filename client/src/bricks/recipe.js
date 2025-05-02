@@ -16,14 +16,14 @@ function Recipe(props) {
                 </div>
 
                 <div>
-                    <span className="Align-right" style={{ marginRight: 24 }}>
-                        <img src={imageUrl} alt={props.recipe.image} style={{ width: "150px", height: "auto" }}></img>
-                    </span>
-                    <span className="Align-left" style={{ marginBottom: 6 }}>
+                    <div className="Align-right" style={{ marginRight: 24 }}>
+                        <img src={imageUrl} alt={props.recipe.image} className="Image-container"></img>
+                    </div>
+                    <div className="Align-left" style={{ marginBottom: 10 }}>
                         <Button variant="success" onClick={() => navigate(`/recipe/${props.recipe.id}`)}>
                             Detail
                         </Button>
-                    </span>
+                    </div>
                 </div>
 
                 <div className="Align-left" style={{ fontWeight: "bold" }}>
@@ -36,15 +36,21 @@ function Recipe(props) {
                         if (!match) return null;
 
                         return (
-                            <div key={reqIng.id} className="d-flex justify-content-between">
-                                <span>{match.name}</span>
-                                <br></br>
-                                <>{reqIng.requiredAmountValue} {reqIng.requiredAmountUnit} required</>
-                                <br></br>
+                            <div key={reqIng.id}>
+                                <div className="Align-left">
+                                    {match.name}
+                                </div>
+                                <div className="Align-right">
+                                    {reqIng.requiredAmountValue} {reqIng.requiredAmountUnit} required
+                                </div>
                                 {match.amountValue !== 0 ? (
-                                    <>{match.amountValue} {match.amountUnit} available</>
+                                    <div className="Align-right">
+                                        {match.amountValue} {match.amountUnit} available
+                                    </div>
                                 ) : (
-                                    <>unavailable</>
+                                    <div className="Align-right">
+                                        unavailable
+                                    </div>
                                 )}
                             </div>
                         );
