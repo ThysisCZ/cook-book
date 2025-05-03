@@ -8,8 +8,8 @@ const dao = new IngredientDao(
 const schema = {
     type: "object",
     properties: {
-        name: { type: "string" },
-        amountValue: { type: "number" },
+        name: { type: "string", minLength: 1, maxLength: 20 },
+        amountValue: { type: "number", minimum: 0.001, maximum: 9999999 },
         amountUnit: { type: "string" }
     },
     required: ["name", "amountValue", "amountUnit"]
@@ -32,11 +32,7 @@ async function CreateAbl(req, res) {
             });
         }
     } catch (e) {
-        if (e.includes("Ingredient with ID ")) {
-            res.status(400).send({ errorMessage: e, params: req.body });
-        } else {
-            res.status(500).send(e);
-        }
+        res.status(500).send(e);
     }
 }
 

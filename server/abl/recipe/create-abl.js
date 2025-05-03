@@ -8,16 +8,16 @@ const dao = new RecipeDao(
 const schema = {
     type: "object",
     properties: {
-        name: { type: "string" },
+        name: { type: "string", minLength: 1, maxLength: 20 },
         image: { type: "string" },
-        preparationProcess: { type: "string" },
+        preparationProcess: { type: "string", minLength: 1, maxLength: 4000 },
         requiredIngredients: {
             type: "array",
             items: {
                 type: "object",
                 properties: {
                     id: { type: "string" },
-                    requiredAmountValue: { type: "number" },
+                    requiredAmountValue: { type: "number", minimum: 0.001, maximum: 9999999 },
                     requiredAmountUnit: { type: "string" },
                 },
                 required: ["id", "requiredAmountValue", "requiredAmountUnit"]
@@ -45,11 +45,7 @@ async function CreateAbl(req, res) {
             });
         }
     } catch (e) {
-        if (e.includes("Recipe with ID ")) {
-            res.status(400).send({ errorMessage: e, params: req.body });
-        } else {
-            res.status(500).send(e);
-        }
+        res.status(500).send(e);
     }
 }
 
