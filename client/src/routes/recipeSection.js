@@ -14,6 +14,7 @@ function RecipeSection() {
     const [addRecipeShow, setAddRecipeShow] = useState(false);
     //state that triggers an event in recipe list lifecycle after change
     const [searchBy, setSearchBy] = useState("");
+    const [notFound, setNotFound] = useState(false);
 
     //prevents unnecessary recipe list rendering
     const recipeList = useMemo(() => {
@@ -73,13 +74,13 @@ function RecipeSection() {
             //find a favourite ingredient name based on required ingredient ID
             const names = rec.requiredIngredients.map((reqIng) => {
                 const match = ingredientList.find((favIng) => favIng.id === reqIng.id);
-                return match ? match.name.toLocaleLowerCase() : null;
+                return match ? match.name.toLocaleLowerCase() : "";
             });
 
             //check if any item in the search field matches any ingredient name
             return items.find((item) =>
                 names.find((name) => name.includes(item))
-            )
+            );
         });
         //useMemo reacts on the change of the searchBy state
     }, [searchBy, recipeList, ingredientList]);
@@ -91,9 +92,24 @@ function RecipeSection() {
         setSearchBy(e.target["searchInput"].value);
     }
 
+    //handle display logic for recipes that are not found
+    useEffect(() => {
+        if (!searchBy) {
+            setNotFound(false);
+        } else {
+            //if the user typed in ingredients and the filtered list is empty
+            if (filteredRecipeList.length === 0) {
+                setNotFound(true);
+            }
+        }
+    }, [searchBy, filteredRecipeList.length]);
+
     //function that gets triggered everytime the search input changes
     function handleSearchDelete(e) {
-        if (!e.target.value) setSearchBy("");
+        if (!e.target.value) {
+            setSearchBy("");
+            setNotFound(false);
+        }
     }
 
     return (
@@ -140,6 +156,9 @@ function RecipeSection() {
                 )}
                 {recipeListCall.state === "success" && recipeListCall.data.length === 0 && (
                     <p>There are no recipes.</p>
+                )}
+                {notFound && recipeListCall.state === "success" && recipeListCall.data.length > 0 && (
+                    <p>No recipes found.</p>
                 )}
             </div>
 
