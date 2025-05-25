@@ -4,6 +4,10 @@ const RecipeDao = require('../../dao/recipe-dao');
 const dao = new RecipeDao(
     path.join(__dirname, "..", "..", "storage", "recipes.json")
 );
+const IngredientDao = require('../../dao/ingredient-dao');
+const ingredientDao = new IngredientDao(
+    path.join(__dirname, "..", "..", "storage", "ingredients.json")
+);
 
 const schema = {
     type: "object",
@@ -34,6 +38,22 @@ async function CreateAbl(req, res) {
         const valid = ajv.validate(schema, req.body);
         if (valid) {
             let recipe = req.body;
+            //loop over each ingredient object
+            for (const ing of recipe.requiredIngredients) {
+                if (ing.id) {
+                    //get ingredient ID with a DAO method
+                    let ingredient = await ingredientDao.getIngredient(ing.id);
+                    //check if ingredient exists
+                    if (!ingredient) {
+                        res.status(400).send({
+                            errorMessage: `Ingredient with given id ${ing.id} does not exist.`,
+                            params: req.body,
+                            reason: ajv.errors,
+                        });
+                        return;
+                    }
+                }
+            }
             recipe = await dao.createRecipe(recipe);
             const recipeList = await dao._loadAllRecipes();
             res.json({ recipe, recipeList });
