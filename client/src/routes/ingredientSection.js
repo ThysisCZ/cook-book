@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/Button';
 import IngredientForm from '../bricks/ingredientForm';
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import Icon from '@mdi/react';
+import { mdiLoading } from '@mdi/js';
 
 function IngredientSection() {
     const { ingredientListCall, setIngredientListCall } = useOutletContext();
@@ -29,7 +31,9 @@ function IngredientSection() {
                 </Button>
             </div>
             <div>
-                {ingredientListCall.state === "pending" && <p>Loading...</p>}
+                {ingredientListCall.state === "pending" && (
+                    <Icon size={2} path={mdiLoading} spin={true} />
+                )}
                 {ingredientListCall.state === "error" && (
                     <p>{ingredientListCall.error}</p>
                 )}

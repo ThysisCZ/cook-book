@@ -43,8 +43,10 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
         e.stopPropagation();
 
         const isDuplicate = recipeList.find((rec) => rec.name === formData.name);
+        const isInvalid = !formData.image || invalidFile;
 
-        if (!form.checkValidity() || isDuplicate) {
+        //prevent form submition in case these conditions are true
+        if (!form.checkValidity() || isDuplicate || isInvalid) {
             setValidated(true);
             return;
         }
@@ -141,21 +143,20 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                                     chooseLabel={formData.image || "Upload"}
                                     url="http://localhost:8000/images"
                                     accept="image/*"
-                                    maxFileSize={730000}
+                                    maxFileSize={2000000}
                                     auto={true}
                                     onUpload={(e) => {
                                         const response = e.xhr.response ? JSON.parse(e.xhr.response) : {};
                                         if (response.filename) {
-                                            setField("image", response.filename);
-                                            setInvalidFile(false);
-                                        }
-                                    }}
-                                    onSelect={(e) => {
-                                        const file = e.files[0];
-                                        if (file) {
-                                            if (!file.type.startsWith("image/")) {
-                                                setField("image", "");
-                                                setInvalidFile(true);
+                                            const file = e.files[0];
+                                            if (file) {
+                                                if (!file.type.startsWith("image/")) {
+                                                    setField("image", "");
+                                                    setInvalidFile(true);
+                                                } else {
+                                                    setField("image", response.filename);
+                                                    setInvalidFile(false);
+                                                }
                                             }
                                         }
                                     }}
@@ -163,8 +164,7 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                             </Button>
                         </div>
                         <div className="Invalid-feedback">
-                            {validated && !formData.image && !invalidFile && "Please upload an image"}
-                            {validated && !formData.image && invalidFile && "File must be an image"}
+                            {validated && !formData.image && "Please upload an image"}
                         </div>
                     </Form.Group>
                     <Form.Group as={Col} className="mb-3">

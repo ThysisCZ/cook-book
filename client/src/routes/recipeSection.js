@@ -6,7 +6,7 @@ import { useOutletContext } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Icon from '@mdi/react';
-import { mdiMagnify } from '@mdi/js';
+import { mdiMagnify, mdiLoading } from '@mdi/js';
 
 function RecipeSection() {
     const { ingredientListCall } = useOutletContext();
@@ -147,7 +147,9 @@ function RecipeSection() {
                 </div>
             </div>
             <div>
-                {recipeListCall.state === "pending" && <p>Loading...</p>}
+                {recipeListCall.state === "pending" && (
+                    <Icon size={2} path={mdiLoading} spin={true} />
+                )}
                 {recipeListCall.state === "error" && (
                     <p>{recipeListCall.error}</p>
                 )}

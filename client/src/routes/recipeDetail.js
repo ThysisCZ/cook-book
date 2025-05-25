@@ -32,7 +32,6 @@ function RecipeDetail() {
                 return (
                     <div className="Align-center">
                         <Icon size={2} path={mdiLoading} spin={true} />
-                        <p>Loading recipe...</p>
                     </div>
                 );
             case "success":
