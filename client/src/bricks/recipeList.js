@@ -8,7 +8,7 @@ function RecipeList(props) {
                 return (
                     <div
                         key={recipe.id}
-                        className="col-22 col-sm-10 col-md-6 col-lg-6 col-xl-4"
+                        className="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-4"
                         style={{ paddingBottom: "10px" }}
                     >
                         <Recipe recipe={recipe} ingredientListCall={props.ingredientListCall} />
