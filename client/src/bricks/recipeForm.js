@@ -2,7 +2,7 @@ import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
 import { FileUpload } from 'primereact/fileupload';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingredientListCall }) {
     const defaultForm = {
@@ -22,6 +22,7 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
     const [formData, setFormData] = useState(defaultForm);
     const [addRecipeCall, setAddRecipeCall] = useState({ state: "inactive" });
     const [invalidFile, setInvalidFile] = useState(false);
+    const [duplicateIngredients, setDuplicateIngredients] = useState([]);
 
     const recipeList = recipeListCall.state === "success" ? recipeListCall.data : [];
     const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
@@ -35,6 +36,17 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
     const setField = (name, val) => {
         setFormData((formData) => ({ ...formData, [name]: val }));
     };
+
+    //check duplicate ingredients
+    useEffect(() => {
+        //extract ids
+        const ids = formData.requiredIngredients.map((ing) => ing.id);
+
+        //check if any id occurs more than once by comparing their index with the current index
+        const duplicates = ids.map((id, idx) => ids.indexOf(id) !== idx ? idx : null);
+
+        setDuplicateIngredients(duplicates)
+    }, [formData.requiredIngredients]);
 
     const handleSubmit = async (e) => {
         const form = e.currentTarget;
@@ -122,10 +134,7 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                             }}
                             maxLength={20}
                             required
-                            isInvalid={
-                                (validated && formData.name.length === 0) ||
-                                (validated && recipeList.find((rec) => rec.name === formData.name))
-                            }
+                            isInvalid={validated && formData.name.length === 0}
                         />
                         <Form.Control.Feedback type="invalid">
                             {validated && formData.name.length === 0 && "This field is required"}
@@ -212,6 +221,14 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                                             const updatedIngredients = [...formData.requiredIngredients];
                                             updatedIngredients[idx].id = e.target.value;
                                             setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+
+                                            if (!formData.requiredIngredients[idx].id) {
+                                                e.target.setCustomValidity("No ingredient");
+                                            } else if (updatedIngredients.filter((ing) => ing.id === e.target.value).length > 1) {
+                                                e.target.setCustomValidity("Duplicate")
+                                            } else {
+                                                e.target.setCustomValidity("")
+                                            }
                                         }}
                                         required
                                         isInvalid={validated && !formData.requiredIngredients[idx].id}
@@ -228,7 +245,8 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
                                         })}
                                     </Form.Select>
                                     <Form.Control.Feedback type="invalid">
-                                        No ingredient selected
+                                        {validated && !formData.requiredIngredients[idx].id && "No ingredient selected"}
+                                        {validated && formData.requiredIngredients[idx].id && duplicateIngredients.includes(idx) && "Duplicate ingredient"}
                                     </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group as={Col} className="mb-3">

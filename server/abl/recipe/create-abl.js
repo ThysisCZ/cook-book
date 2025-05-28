@@ -45,7 +45,7 @@ async function CreateAbl(req, res) {
                     let ingredient = await ingredientDao.getIngredient(ing.id);
                     //check if ingredient exists
                     if (!ingredient) {
-                        res.status(400).send({
+                        res.status(404).send({
                             errorMessage: `Ingredient with given id ${ing.id} does not exist.`,
                             params: req.body,
                             reason: ajv.errors,
@@ -53,6 +53,18 @@ async function CreateAbl(req, res) {
                         return;
                     }
                 }
+            }
+            //extract ids
+            const ids = recipe.requiredIngredients.map((ing) => ing.id)
+            //check if any id occurs more than once by comparing their index with the current index
+            const hasDuplicates = ids.find((id, idx) => ids.indexOf(id) !== idx)
+            if (hasDuplicates) {
+                res.status(403).send({
+                    errorMessage: `Recipe contains duplicit ingredients.`,
+                    params: req.body,
+                    reason: ajv.errors,
+                });
+                return;
             }
             recipe = await dao.createRecipe(recipe);
             const recipeList = await dao._loadAllRecipes();

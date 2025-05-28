@@ -26,8 +26,8 @@ async function GetAbl(req, res) {
             const ingredient = await dao.getIngredient(ingredientId); //pass ID to getIngredient DAO method
             if (!ingredient) { //if no ingredient is found
                 res
-                    .status(400)
-                    .send({ error: `Ingredient with id '${ingredientId}' doesn't exist.` });
+                    .status(404)
+                    .send({ error: `Ingredient with given id '${ingredientId}' does not exist.` });
             }
             res.json(ingredient); //send back ingredient JSON object
         } else { //dtoIn is not valid
