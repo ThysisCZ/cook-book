@@ -7,13 +7,13 @@
   },
   {
     "name": "meat",
-    "amountValue": 500,
+    "amountValue": 400,
     "amountUnit": "g",
     "id": "1e838cb06cfeb01c"
   },
   {
     "name": "salt",
-    "amountValue": 400,
+    "amountValue": 300,
     "amountUnit": "g",
     "id": "e6w8en8d5i8j04x8"
   },

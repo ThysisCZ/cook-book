@@ -1,4 +1,3 @@
-import React from 'react';
 import Ingredient from './ingredient';
 
 function IngredientList(props) {

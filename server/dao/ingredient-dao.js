@@ -36,6 +36,21 @@ class IngredientsDao {
         return ingredient;
     }
 
+    async updateIngredient(ingredient) {
+        let ingredientList = await this._loadAllIngredients();
+        const ingredientIndex = ingredientList.findIndex((ing) => ing.id === ingredient.id);
+        if (ingredientIndex < 0) {
+            throw new Error(`Ingredient with given id '${ingredient.id}' does not exist.`);
+        } else {
+            ingredientList[ingredientIndex] = {
+                ...ingredientList[ingredientIndex],
+                ...ingredient
+            };
+        }
+        await wf(this._getStorageLocation(), JSON.stringify(ingredientList, null, 2));
+        return ingredientList[ingredientIndex];
+    }
+
     //private helper method - reads ingredient data from JSON
     async _loadAllIngredients() {
         let ingredientList;

@@ -4,7 +4,7 @@ import { mdiLoading } from '@mdi/js';
 import { FileUpload } from 'primereact/fileupload';
 import { useState, useEffect } from 'react';
 
-function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingredientListCall }) {
+function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingredientListCall }) {
     const defaultForm = {
         name: "",
         image: "",
@@ -340,4 +340,4 @@ function RecipeForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingred
     );
 }
 
-export default RecipeForm;
+export default RecipeAddForm;

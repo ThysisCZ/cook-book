@@ -1,4 +1,3 @@
-import React from 'react';
 import Recipe from './recipe';
 
 function RecipeList(props) {

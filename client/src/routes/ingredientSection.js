@@ -1,6 +1,6 @@
 import IngredientList from '../bricks/ingredientList';
 import Button from 'react-bootstrap/Button';
-import IngredientForm from '../bricks/ingredientForm';
+import IngredientAddForm from '../bricks/ingredientAddForm';
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import Icon from '@mdi/react';
@@ -45,7 +45,7 @@ function IngredientSection() {
                 )}
             </div>
 
-            <IngredientForm
+            <IngredientAddForm
                 show={addIngredientShow}
                 setAddIngredientShow={setAddIngredientShow}
                 onComplete={(ingredient) => handleIngredientAdded(ingredient)}

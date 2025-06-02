@@ -36,6 +36,21 @@ class RecipesDao {
         return recipe;
     }
 
+    async updateRecipe(recipe) {
+        let recipeList = await this._loadAllRecipes();
+        const recipeIndex = recipeList.findIndex((rec) => rec.id === recipe.id);
+        if (recipeIndex < 0) {
+            throw new Error(`Recipe with given id '${recipe.id}' does not exist.`);
+        } else {
+            recipeList[recipeIndex] = {
+                ...recipeList[recipeIndex],
+                ...recipe
+            };
+        }
+        await wf(this._getStorageLocation(), JSON.stringify(recipeList, null, 2));
+        return recipeList[recipeIndex];
+    }
+
     //private helper method - reads recipe data from JSON
     async _loadAllRecipes() {
         let recipeList;

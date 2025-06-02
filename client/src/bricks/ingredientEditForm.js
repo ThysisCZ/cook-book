@@ -3,23 +3,22 @@ import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
 import { useState } from 'react';
 
-function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientListCall }) {
+function IngredientEditForm({ show, setEditIngredientShow, onComplete, ingredient }) {
     const defaultForm = {
-        name: "",
-        amountValue: null,
-        amountUnit: "g"
+        name: ingredient?.name || "",
+        amountValue: ingredient?.amountValue || null,
+        amountUnit: ingredient?.amountUnit || "g",
+        id: ingredient?.id || null
     };
 
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(defaultForm);
-    const [addIngredientCall, setAddIngredientCall] = useState({ state: "inactive" });
-
-    const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
+    const [editIngredientCall, setEditIngredientCall] = useState({ state: "inactive" });
 
     const handleClose = () => {
         setFormData(defaultForm);
         setValidated(false);
-        setAddIngredientShow(false);
+        setEditIngredientShow(false);
     };
 
     const setField = (name, val) => {
@@ -32,9 +31,7 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
         e.preventDefault();
         e.stopPropagation();
 
-        const isDuplicate = ingredientList.find((ing) => ing.name === formData.name);
-
-        if (!form.checkValidity() || isDuplicate) {
+        if (!form.checkValidity()) {
             setValidated(true);
             return;
         }
@@ -43,11 +40,11 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
             ...formData
         };
 
-        setAddIngredientCall({ state: "pending" });
+        setEditIngredientCall({ state: "pending" });
 
         try {
-            const res = await fetch(`http://localhost:8000/ingredient/create`, {
-                method: "POST",
+            const res = await fetch(`http://localhost:8000/ingredient/update?id=${formData.id}`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -57,14 +54,14 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
             const data = await res.json();
 
             if (res.status >= 400) {
-                setAddIngredientCall({ state: "error", error: data });
+                setEditIngredientCall({ state: "error", error: data });
             } else {
-                setAddIngredientCall({ state: "success", data });
+                setEditIngredientCall({ state: "success", data });
                 onComplete(data.ingredient);
                 handleClose();
             }
         } catch (err) {
-            setAddIngredientCall({ state: "error", error: { errorMessage: err.message } });
+            setEditIngredientCall({ state: "error", error: { errorMessage: err.message } });
         }
     };
 
@@ -72,7 +69,7 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
         <Modal show={show} onHide={handleClose}>
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Modal.Header>
-                    <Modal.Title>Create Ingredient</Modal.Title>
+                    <Modal.Title>Edit Ingredient</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
@@ -82,22 +79,13 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                             value={formData.name}
                             onChange={(e) => {
                                 setField("name", e.target.value);
-                                const isDuplicate = ingredientList.find(
-                                    (ing) => ing.name === e.target.value
-                                );
-                                e.target.setCustomValidity(isDuplicate ? "Duplicate" : "");
                             }}
                             maxLength={20}
                             required
-                            isInvalid={
-                                (validated && formData.name.length === 0) ||
-                                (validated && ingredientList.find((ing) => ing.name === formData.name))
-                            }
+                            isInvalid={validated && formData.name.length === 0}
                         />
                         <Form.Control.Feedback type="invalid">
                             {validated && formData.name.length === 0 && "This field is required"}
-                            {validated && ingredientList.find((ing) => ing.name === formData.name)
-                                && "This ingredient already exists"}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Row>
@@ -158,19 +146,19 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
                 <Modal.Footer>
                     <div className="d-flex flex-row justify-content-between align-items-center w-100">
                         <div>
-                            {addIngredientCall.state === "error" &&
-                                <div className="text-danger">Error: {addIngredientCall.error.errorMessage}</div>
+                            {editIngredientCall.state === "error" &&
+                                <div className="text-danger">Error: {editIngredientCall.error.errorMessage}</div>
                             }
                         </div>
                         <div className="d-flex flex-row gap-2">
                             <Button variant="secondary" onClick={handleClose}>
                                 Cancel
                             </Button>
-                            <Button variant="primary" type="submit" disabled={addIngredientCall.state === 'pending'}>
-                                {addIngredientCall.state === "pending" ? (
+                            <Button variant="primary" type="submit" disabled={editIngredientCall.state === 'pending'}>
+                                {editIngredientCall.state === "pending" ? (
                                     <Icon size={0.8} path={mdiLoading} spin={true} />
                                 ) : (
-                                    "Create"
+                                    "Edit"
                                 )}
                             </Button>
                         </div>
@@ -181,4 +169,4 @@ function IngredientForm({ show, setAddIngredientShow, onComplete, ingredientList
     );
 }
 
-export default IngredientForm;
+export default IngredientEditForm;

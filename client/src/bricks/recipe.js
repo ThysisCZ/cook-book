@@ -1,7 +1,8 @@
-import { React } from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
+import Icon from '@mdi/react';
+import { mdiPencilBox } from '@mdi/js';
 
 function Recipe(props) {
     const ingredientList = props.ingredientListCall.state === "success" ? props.ingredientListCall.data : [];
@@ -11,8 +12,14 @@ function Recipe(props) {
     return (
         <Card>
             <Card.Body>
-                <div className="Align-left" style={{ fontWeight: "bold" }}>
-                    {props.recipe.name}
+                <div className="d-flex justify-content-between">
+                    <div style={{ fontWeight: "bold" }}>
+                        {props.recipe.name}
+                    </div>
+
+                    <div>
+                        <Icon size={1} style={{ color: "salmon" }} path={mdiPencilBox}></Icon>
+                    </div>
                 </div>
 
                 <div>
