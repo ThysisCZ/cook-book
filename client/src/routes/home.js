@@ -4,7 +4,7 @@ function Home() {
     return (
         <div className="App">
             <header className="App-header">
-                Personal Recipe Manager
+                Recipe Manager
             </header>
             <header className="Dashboard-header">
                 Dashboard
