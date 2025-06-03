@@ -4,33 +4,40 @@ import { mdiLoading } from '@mdi/js';
 import { FileUpload } from 'primereact/fileupload';
 import { useState, useEffect } from 'react';
 
-function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingredientListCall }) {
+function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCall, recipe }) {
     const defaultForm = {
-        name: "",
-        image: "",
-        preparationProcess: "",
-        requiredIngredients: [
-            {
-                id: "",
-                requiredAmountValue: null,
-                requiredAmountUnit: "g"
-            }
-        ]
+        name: recipe.name,
+        image: recipe.image,
+        preparationProcess: recipe.preparationProcess,
+        requiredIngredients: recipe.requiredIngredients,
+        id: recipe.id
     };
 
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(defaultForm);
-    const [addRecipeCall, setAddRecipeCall] = useState({ state: "inactive" });
+    const [editRecipeCall, setEditRecipeCall] = useState({ state: "inactive" });
     const [invalidFile, setInvalidFile] = useState(false);
     const [duplicateIngredients, setDuplicateIngredients] = useState([]);
 
-    const recipeList = recipeListCall.state === "success" ? recipeListCall.data : [];
+    //update form data when recipe changes
+    useEffect(() => {
+        if (recipe) {
+            setFormData({
+                name: recipe.name,
+                image: recipe.image,
+                preparationProcess: recipe.preparationProcess,
+                requiredIngredients: recipe.requiredIngredients,
+                id: recipe.id
+            });
+        }
+    }, [recipe]);
+
     const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
 
     const handleClose = () => {
         setFormData(defaultForm);
         setValidated(false);
-        setAddRecipeShow(false);
+        setEditRecipeShow(false);
         setInvalidFile(false);
     };
 
@@ -55,11 +62,10 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
         e.preventDefault();
         e.stopPropagation();
 
-        const isDuplicate = recipeList.find((rec) => rec.name === formData.name);
         const isInvalid = !formData.image || invalidFile;
 
         //prevent form submition in case these conditions are true
-        if (!form.checkValidity() || isDuplicate || isInvalid) {
+        if (!form.checkValidity() || isInvalid) {
             setValidated(true);
             return;
         }
@@ -68,11 +74,11 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
             ...formData
         };
 
-        setAddRecipeCall({ state: "pending" });
+        setEditRecipeCall({ state: "pending" });
 
         try {
-            const res = await fetch(`http://localhost:8000/recipe/create`, {
-                method: "POST",
+            const res = await fetch(`http://localhost:8000/recipe/update?id=${formData.id}`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -82,14 +88,14 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
             const data = await res.json();
 
             if (res.status >= 400) {
-                setAddRecipeCall({ state: "error", error: data });
+                setEditRecipeCall({ state: "error", error: data });
             } else {
-                setAddRecipeCall({ state: "success", data });
+                setEditRecipeCall({ state: "success", data });
                 onComplete(data.recipe);
                 handleClose();
             }
         } catch (err) {
-            setAddRecipeCall({ state: "error", error: { errorMessage: err.message } });
+            setEditRecipeCall({ state: "error", error: { errorMessage: err.message } });
         }
     };
 
@@ -118,7 +124,7 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
         <Modal show={show} onHide={handleClose}>
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Modal.Header>
-                    <Modal.Title>Create Recipe</Modal.Title>
+                    <Modal.Title>Edit Recipe</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
@@ -128,10 +134,6 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                             value={formData.name}
                             onChange={(e) => {
                                 setField("name", e.target.value);
-                                const isDuplicate = recipeList.find(
-                                    (rec) => rec.name === e.target.value
-                                );
-                                e.target.setCustomValidity(isDuplicate ? "Duplicate" : "");
                             }}
                             maxLength={20}
                             required
@@ -139,8 +141,6 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                         />
                         <Form.Control.Feedback type="invalid">
                             {validated && formData.name.length === 0 && "This field is required"}
-                            {validated && recipeList.find((rec) => rec.name === formData.name)
-                                && "This recipe already exists"}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} className="mb-3">
@@ -323,19 +323,19 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                 <Modal.Footer>
                     <div className="d-flex flex-row justify-content-between align-items-center w-100">
                         <div>
-                            {addRecipeCall.state === "error" &&
-                                <div className="text-danger">Error: {addRecipeCall.error.errorMessage}</div>
+                            {editRecipeCall.state === "error" && editRecipeCall.error?.errorMessage &&
+                                <div className="text-danger">Error: {editRecipeCall.error.errorMessage}</div>
                             }
                         </div>
                         <div className="d-flex flex-row gap-2">
                             <Button variant="secondary" onClick={handleClose}>
                                 Cancel
                             </Button>
-                            <Button variant="primary" type="submit" disabled={addRecipeCall.state === "pending"}>
-                                {addRecipeCall.state === "pending" ? (
+                            <Button variant="primary" type="submit" disabled={editRecipeCall.state === "pending"}>
+                                {editRecipeCall.state === "pending" ? (
                                     <Icon size={0.8} path={mdiLoading} spin={true} />
                                 ) : (
-                                    "Create"
+                                    "Edit"
                                 )}
                             </Button>
                         </div>
@@ -346,4 +346,4 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
     );
 }
 
-export default RecipeAddForm;
+export default RecipeEditForm;

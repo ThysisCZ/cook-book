@@ -8,7 +8,7 @@ function IngredientEditForm({ show, setEditIngredientShow, onComplete, ingredien
         name: ingredient?.name || "",
         amountValue: ingredient?.amountValue || null,
         amountUnit: ingredient?.amountUnit || "g",
-        id: ingredient?.id || null
+        id: ingredient?.id || ""
     };
 
     const [validated, setValidated] = useState(false);

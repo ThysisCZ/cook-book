@@ -10,12 +10,17 @@ function RecipeList(props) {
                         className="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-4"
                         style={{ paddingBottom: "10px" }}
                     >
-                        <Recipe recipe={recipe} ingredientListCall={props.ingredientListCall} />
+                        <Recipe
+                            recipe={recipe}
+                            ingredientListCall={props.ingredientListCall}
+                            recipeListCall={props.recipeListCall}
+                            setRecipeListCall={props.setRecipeListCall}
+                        />
                     </div>
                 );
             })}
         </div>
     );
-}
+};
 
 export default RecipeList;

@@ -152,9 +152,13 @@ function RecipeSection() {
                 )}
                 {recipeListCall.state === "error" && (
                     <p>{recipeListCall.error}</p>
-                )}
-                {recipeListCall.state === "success" && recipeListCall.data.length > 0 && (
-                    <RecipeList recipeList={filteredRecipeList} ingredientListCall={ingredientListCall} />
+                )}                {recipeListCall.state === "success" && recipeListCall.data.length > 0 && (
+                    <RecipeList
+                        recipeList={filteredRecipeList}
+                        ingredientListCall={ingredientListCall}
+                        recipeListCall={recipeListCall}
+                        setRecipeListCall={setRecipeListCall}
+                    />
                 )}
                 {recipeListCall.state === "success" && recipeListCall.data.length === 0 && (
                     <p>There are no recipes.</p>
