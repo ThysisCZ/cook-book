@@ -1,6 +1,7 @@
 import Accordion from 'react-bootstrap/Accordion';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { fetchApi } from '../services/api';
 
 function Sections() {
     const navigate = useNavigate();
@@ -12,21 +13,12 @@ function Sections() {
         return null;
     })();
 
-    const [ingredientListCall, setIngredientListCall] = useState({ state: "pending" });
-
-    useEffect(() => {
+    const [ingredientListCall, setIngredientListCall] = useState({ state: "pending" }); useEffect(() => {
         async function fetchIngredients() {
             setIngredientListCall({ state: "pending" });
-
             try {
-                const res = await fetch("http://localhost:8000/ingredient/list");
-                const data = await res.json();
-
-                if (res.status >= 400) {
-                    setIngredientListCall({ state: "error", error: data });
-                } else {
-                    setIngredientListCall({ state: "success", data });
-                }
+                const data = await fetchApi("ingredient/list");
+                setIngredientListCall({ state: "success", data });
             } catch (err) {
                 setIngredientListCall({ state: "error", error: err.message });
             }

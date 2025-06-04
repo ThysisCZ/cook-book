@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
-import { Card, Button } from 'react-bootstrap'
+import { Card, Button } from 'react-bootstrap';
+import { fetchApi } from '../services/api';
 
 function RecipeDetail() {
     const [recipeLoadCall, setRecipeLoadCall] = useState({
@@ -12,18 +13,18 @@ function RecipeDetail() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        setRecipeLoadCall({ state: "pending" });
+        async function loadRecipe() {
+            setRecipeLoadCall({ state: "pending" });
 
-        fetch(`http://localhost:8000/recipe/get?id=${id}`, {
-            method: "GET",
-        }).then(async (response) => {
-            const responseJson = await response.json();
-            if (response.status >= 400) {
-                setRecipeLoadCall({ state: "error", error: responseJson });
-            } else {
-                setRecipeLoadCall({ state: "success", data: responseJson });
+            try {
+                const data = await fetchApi(`recipes/get?id=${id}`);
+                setRecipeLoadCall({ state: "success", data });
+            } catch (err) {
+                setRecipeLoadCall({ state: "error", error: err.message });
             }
-        });
+        }
+
+        loadRecipe();
     }, [id]);
 
     function getChild() {

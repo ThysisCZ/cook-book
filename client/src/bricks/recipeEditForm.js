@@ -1,16 +1,23 @@
-import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
+import { Modal, Form, Button, Col, Row } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
+import { useState, useEffect, useRef } from 'react';
+import { fetchApi } from '../services/api';
 import { FileUpload } from 'primereact/fileupload';
-import { useState, useEffect } from 'react';
+import { imageService } from '../services/ImageService';
 
 function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCall, recipe }) {
     const defaultForm = {
-        name: recipe.name,
-        image: recipe.image,
-        preparationProcess: recipe.preparationProcess,
-        requiredIngredients: recipe.requiredIngredients,
-        id: recipe.id
+        name: "",
+        image: "",
+        imageFile: null,
+        preparationProcess: "",
+        requiredIngredients: [{
+            id: "",
+            requiredAmountValue: "",
+            requiredAmountUnit: "g"
+        }],
+        id: ""
     };
 
     const [validated, setValidated] = useState(false);
@@ -18,23 +25,31 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
     const [editRecipeCall, setEditRecipeCall] = useState({ state: "inactive" });
     const [invalidFile, setInvalidFile] = useState(false);
     const [duplicateIngredients, setDuplicateIngredients] = useState([]);
-
-    //update form data when recipe changes
-    useEffect(() => {
-        if (recipe) {
-            setFormData({
-                name: recipe.name,
-                image: recipe.image,
-                preparationProcess: recipe.preparationProcess,
-                requiredIngredients: recipe.requiredIngredients,
-                id: recipe.id
-            });
-        }
-    }, [recipe]);
+    const fileUploadRef = useRef(null);
 
     const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
 
+    // Update form data when recipe changes or modal is shown
+    useEffect(() => {
+        if (show && recipe) {
+            setFormData({
+                name: recipe.name || "",
+                image: recipe.image || "",
+                imageFile: null,
+                preparationProcess: recipe.preparationProcess || "",
+                requiredIngredients: (recipe.requiredIngredients || []).map(ing => ({
+                    ...ing,
+                    requiredAmountValue: ing.requiredAmountValue?.toString() || ""
+                })),
+                id: recipe.id || ""
+            });
+        }
+    }, [recipe, show]);
+
     const handleClose = () => {
+        if (fileUploadRef.current) {
+            fileUploadRef.current.clear();
+        }
         setFormData(defaultForm);
         setValidated(false);
         setEditRecipeShow(false);
@@ -42,99 +57,104 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
     };
 
     const setField = (name, val) => {
-        setFormData((formData) => ({ ...formData, [name]: val }));
+        setFormData(formData => ({ ...formData, [name]: val }));
     };
 
-    //check duplicate ingredients
+    // Check duplicate ingredients
     useEffect(() => {
-        //extract ids
-        const ids = formData.requiredIngredients.map((ing) => ing.id);
-
-        //check if any id occurs more than once by comparing their index with the current index
+        const ids = formData.requiredIngredients
+            .filter(ing => ing.id) // Only check ingredients that have been selected
+            .map(ing => ing.id);
         const duplicates = ids.map((id, idx) => ids.indexOf(id) !== idx ? idx : null);
-
-        setDuplicateIngredients(duplicates)
-    }, [formData.requiredIngredients]);
-
-    const handleSubmit = async (e) => {
-        const form = e.currentTarget;
-
+        setDuplicateIngredients(duplicates);
+    }, [formData.requiredIngredients]); const handleSubmit = async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setValidated(true);
 
-        const isInvalid = !formData.image || invalidFile;
-
-        //prevent form submition in case these conditions are true
-        if (!form.checkValidity() || isInvalid) {
-            setValidated(true);
-            return;
-        }
-
-        const payload = {
-            ...formData
-        };
-
-        setEditRecipeCall({ state: "pending" });
+        if (!e.target.checkValidity()) return;
+        if (invalidFile) return;
 
         try {
-            const res = await fetch(`http://localhost:8000/recipe/update?id=${formData.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            setEditRecipeCall({ state: "pending" });
+
+            const payload = { ...formData };
+
+            // Only handle image if a new one was uploaded
+            if (formData.imageFile) {
+                const imageResult = await imageService.saveImage(formData.imageFile);
+                payload.image = imageResult;
+                delete payload.imageFile;
+            }
+
+            // Convert numeric values
+            payload.requiredIngredients = payload.requiredIngredients.map(ing => ({
+                ...ing,
+                requiredAmountValue: Math.max(0, parseFloat(ing.requiredAmountValue) || 0)
+            }));
+
+            const data = await fetchApi(`recipes/update?id=${formData.id}`, {
+                method: 'POST',
                 body: JSON.stringify(payload)
             });
-
-            const data = await res.json();
-
-            if (res.status >= 400) {
-                setEditRecipeCall({ state: "error", error: data });
-            } else {
-                setEditRecipeCall({ state: "success", data });
-                onComplete(data.recipe);
-                handleClose();
+            onComplete(data);
+            setValidated(false);
+            if (fileUploadRef.current) {
+                fileUploadRef.current.clear();
             }
+            setEditRecipeShow(false);
+            setEditRecipeCall({ state: "inactive" });
         } catch (err) {
-            setEditRecipeCall({ state: "error", error: { errorMessage: err.message } });
+            console.error(err);
+            setEditRecipeCall({ state: "error", error: err });
         }
-    };
+    }
 
     const handleNewRow = () => {
-        //create a new row by taking all required ingredients data and add a default object to them
         const updatedIngredients = [...formData.requiredIngredients, {
             id: "",
-            requiredAmountValue: null,
+            requiredAmountValue: "",
             requiredAmountUnit: "g"
         }];
-        //update the form with new row
         setFormData((prevFormData) => ({
             ...prevFormData,
             requiredIngredients: updatedIngredients
         }));
-    }
+    };
 
-    //function that removes duplicit code in onChange and onBlur events in amount value field
     const handleAmountUpdate = (e, idx) => {
-        const updatedIngredients = [...formData.requiredIngredients];
-        updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
-        setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
+        const value = e.target.value;
+        if (value === '' || value === '-') {
+            const updatedIngredients = [...formData.requiredIngredients];
+            updatedIngredients[idx].requiredAmountValue = "";
+            setFormData(prev => ({ ...prev, requiredIngredients: updatedIngredients }));
+            return;
+        }
+
+        const numValue = parseFloat(value);
+        if (!isNaN(numValue) && value.length <= 7) {
+            const updatedIngredients = [...formData.requiredIngredients];
+            updatedIngredients[idx].requiredAmountValue = numValue > 0 ? value : "";
+            setFormData(prev => ({ ...prev, requiredIngredients: updatedIngredients }));
+        }
     }
 
     return (
-        <Modal show={show} onHide={handleClose}>
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                <Modal.Header>
-                    <Modal.Title>Edit Recipe</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+        <Modal
+            show={show}
+            onHide={handleClose}
+            centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Edit recipe</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>Name<span style={{ color: "red" }}> *</span></Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.name}
-                            onChange={(e) => {
-                                setField("name", e.target.value);
-                            }}
+                            onChange={(e) => setField("name", e.target.value)}
                             maxLength={20}
                             required
                             isInvalid={validated && formData.name.length === 0}
@@ -143,46 +163,62 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                             {validated && formData.name.length === 0 && "This field is required"}
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Image<span style={{ color: "red" }}> *</span></Form.Label>
                         <div>
                             <Button variant="success">
                                 <FileUpload
-                                    name="image"
+                                    ref={fileUploadRef}
                                     mode="basic"
-                                    chooseLabel={formData.image || "Upload"}
-                                    url="http://localhost:8000/images"
+                                    chooseLabel={formData.imageFile ? formData.imageFile.name : "Upload"}
                                     accept="image/*"
                                     maxFileSize={2000000}
                                     auto={true}
-                                    onUpload={(e) => {
-                                        const response = e.xhr.response ? JSON.parse(e.xhr.response) : {};
-                                        if (response.filename) {
-                                            const file = e.files[0];
-                                            if (file) {
-                                                if (!file.type.startsWith("image/")) {
-                                                    setField("image", "");
-                                                    setInvalidFile(true);
-                                                } else {
-                                                    setField("image", response.filename);
-                                                    setInvalidFile(false);
-                                                }
+                                    customUpload={true}
+                                    onSelect={async (e) => {
+                                        const file = e.files[0];
+                                        if (file) {
+                                            if (!file.type.startsWith("image/")) {
+                                                setField("imageFile", null);
+                                                setField("image", "");
+                                                setInvalidFile(true);
+                                            } else {
+                                                const imageResult = await imageService.saveImage(file);
+                                                setField("imageFile", file);
+                                                setField("image", imageResult);
+                                                setInvalidFile(false);
                                             }
                                         }
                                     }}
                                 />
                             </Button>
                         </div>
-                        <div className="Invalid-feedback">
+                        {formData.image && (
+                            <div style={{ marginTop: '0.25rem' }}>
+                                <img
+                                    src={formData.image}
+                                    alt="Preview"
+                                    style={{ maxWidth: '100px', marginTop: '0.5rem' }}
+                                    onError={() => {
+                                        setField("imageFile", null);
+                                        setField("image", "");
+                                        setInvalidFile(true);
+                                    }}
+                                />
+                            </div>
+                        )}
+                        <Form.Control.Feedback type="invalid" style={{ display: (validated && !formData.image) || invalidFile ? 'block' : 'none' }}>
                             {validated && !formData.image && "Please upload an image"}
-                        </div>
+                            {invalidFile && "Please upload a valid image file"}
+                        </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} className="mb-3">
+
+                    <Form.Group className="mb-3">
                         <Form.Label>Preparation process<span style={{ color: "red" }}> *</span></Form.Label>
                         <Form.Control
                             as="textarea"
-                            name="preparationProcess"
-                            className="Preparation-container"
+                            style={{ minHeight: 100 }}
                             value={formData.preparationProcess}
                             onChange={(e) => setField("preparationProcess", e.target.value)}
                             maxLength={4000}
@@ -193,6 +229,7 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                             This field is required
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Required ingredients<span style={{ color: "red" }}> *</span></Form.Label>
                         <Row style={{ height: 32 }}>
@@ -319,29 +356,30 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                             </Button>
                         </div>
                     </Form.Group>
-                </Modal.Body>
-                <Modal.Footer>
-                    <div className="d-flex flex-row justify-content-between align-items-center w-100">
-                        <div>
-                            {editRecipeCall.state === "error" && editRecipeCall.error?.errorMessage &&
-                                <div className="text-danger">Error: {editRecipeCall.error.errorMessage}</div>
-                            }
-                        </div>
-                        <div className="d-flex flex-row gap-2">
-                            <Button variant="secondary" onClick={handleClose}>
-                                Cancel
-                            </Button>
-                            <Button variant="primary" type="submit" disabled={editRecipeCall.state === "pending"}>
-                                {editRecipeCall.state === "pending" ? (
-                                    <Icon size={0.8} path={mdiLoading} spin={true} />
-                                ) : (
-                                    "Edit"
+
+                    <Modal.Footer>
+                        <div className="d-flex flex-row justify-content-between align-items-center w-100">
+                            <div>
+                                {editRecipeCall.state === "error" && (
+                                    <div className="text-danger">Error: {editRecipeCall.error.message}</div>
                                 )}
-                            </Button>
+                            </div>
+                            <div className="d-flex flex-row gap-2">
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Cancel
+                                </Button>
+                                <Button variant="primary" type="submit" disabled={editRecipeCall.state === "pending"}>
+                                    {editRecipeCall.state === "pending" ? (
+                                        <Icon size={0.8} path={mdiLoading} spin={true} />
+                                    ) : (
+                                        "Save"
+                                    )}
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </Modal.Footer>
-            </Form>
+                    </Modal.Footer>
+                </Form>
+            </Modal.Body>
         </Modal>
     );
 }

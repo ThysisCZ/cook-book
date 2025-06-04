@@ -2,11 +2,12 @@ import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
 import { useState } from 'react';
+import { fetchApi } from '../services/api';
 
 function IngredientEditForm({ show, setEditIngredientShow, onComplete, ingredient }) {
     const defaultForm = {
         name: ingredient?.name || "",
-        amountValue: ingredient?.amountValue || null,
+        amountValue: ingredient?.amountValue?.toString() || "0", // Convert to string for form control
         amountUnit: ingredient?.amountUnit || "g",
         id: ingredient?.id || ""
     };
@@ -26,44 +27,30 @@ function IngredientEditForm({ show, setEditIngredientShow, onComplete, ingredien
     };
 
     const handleSubmit = async (e) => {
-        const form = e.currentTarget;
-
         e.preventDefault();
         e.stopPropagation();
+        setValidated(true);
 
-        if (!form.checkValidity()) {
-            setValidated(true);
-            return;
-        }
-
-        const payload = {
-            ...formData
-        };
-
-        setEditIngredientCall({ state: "pending" });
-
-        try {
-            const res = await fetch(`http://localhost:8000/ingredient/update?id=${formData.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
+        if (!e.target.checkValidity()) return; try {
+            setEditIngredientCall({ state: "pending" });
+            // Convert amountValue to number before sending
+            const submitData = {
+                ...formData,
+                amountValue: parseFloat(formData.amountValue)
+            };
+            const data = await fetchApi(`ingredients/update?id=${formData.id}`, {
+                method: 'POST',
+                body: JSON.stringify(submitData)
             });
-
-            const data = await res.json();
-
-            if (res.status >= 400) {
-                setEditIngredientCall({ state: "error", error: data });
-            } else {
-                setEditIngredientCall({ state: "success", data });
-                onComplete(data.ingredient);
-                handleClose();
-            }
+            onComplete(data);
+            setValidated(false);
+            setEditIngredientShow(false);
+            setEditIngredientCall({ state: "inactive" });
         } catch (err) {
-            setEditIngredientCall({ state: "error", error: { errorMessage: err.message } });
+            console.error(err);
+            setEditIngredientCall({ state: "error", error: err });
         }
-    };
+    }
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -158,7 +145,7 @@ function IngredientEditForm({ show, setEditIngredientShow, onComplete, ingredien
                                 {editIngredientCall.state === "pending" ? (
                                     <Icon size={0.8} path={mdiLoading} spin={true} />
                                 ) : (
-                                    "Edit"
+                                    "Save"
                                 )}
                             </Button>
                         </div>

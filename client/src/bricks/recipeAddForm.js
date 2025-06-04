@@ -1,18 +1,21 @@
-import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
+import { Modal, Form, Button, Col, Row } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
+import { useState, useEffect, useRef } from 'react';
+import { fetchApi } from '../services/api';
 import { FileUpload } from 'primereact/fileupload';
-import { useState, useEffect } from 'react';
+import { imageService } from '../services/ImageService';
 
 function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ingredientListCall }) {
     const defaultForm = {
         name: "",
         image: "",
+        imageFile: null,
         preparationProcess: "",
         requiredIngredients: [
             {
                 id: "",
-                requiredAmountValue: null,
+                requiredAmountValue: "",
                 requiredAmountUnit: "g"
             }
         ]
@@ -23,11 +26,15 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
     const [addRecipeCall, setAddRecipeCall] = useState({ state: "inactive" });
     const [invalidFile, setInvalidFile] = useState(false);
     const [duplicateIngredients, setDuplicateIngredients] = useState([]);
+    const fileUploadRef = useRef(null);
 
     const recipeList = recipeListCall.state === "success" ? recipeListCall.data : [];
     const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
 
     const handleClose = () => {
+        if (fileUploadRef.current) {
+            fileUploadRef.current.clear();
+        }
         setFormData(defaultForm);
         setValidated(false);
         setAddRecipeShow(false);
@@ -35,92 +42,94 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
     };
 
     const setField = (name, val) => {
-        setFormData((formData) => ({ ...formData, [name]: val }));
+        setFormData(formData => ({ ...formData, [name]: val }));
     };
 
-    //check duplicate ingredients
     useEffect(() => {
-        //extract ids
-        const ids = formData.requiredIngredients.map((ing) => ing.id);
+        return () => {
+            if (formData.image && formData.image.startsWith('blob:')) {
+                URL.revokeObjectURL(formData.image);
+            }
+        };
+    }, [formData.image]);
 
-        //check if any id occurs more than once by comparing their index with the current index
+    useEffect(() => {
+        const ids = formData.requiredIngredients.map(ing => ing.id);
         const duplicates = ids.map((id, idx) => ids.indexOf(id) !== idx ? idx : null);
-
-        setDuplicateIngredients(duplicates)
-    }, [formData.requiredIngredients]);
-
-    const handleSubmit = async (e) => {
-        const form = e.currentTarget;
-
+        setDuplicateIngredients(duplicates);
+    }, [formData.requiredIngredients]); const handleSubmit = async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setValidated(true);
 
-        const isDuplicate = recipeList.find((rec) => rec.name === formData.name);
-        const isInvalid = !formData.image || invalidFile;
-
-        //prevent form submition in case these conditions are true
-        if (!form.checkValidity() || isDuplicate || isInvalid) {
-            setValidated(true);
-            return;
-        }
-
-        const payload = {
-            ...formData
-        };
-
-        setAddRecipeCall({ state: "pending" });
+        if (!e.target.checkValidity()) return;
+        if (invalidFile || !formData.imageFile) return;
 
         try {
-            const res = await fetch(`http://localhost:8000/recipe/create`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            setAddRecipeCall({ state: "pending" });
+
+            // First save the image and get the result
+            const imageResult = await imageService.saveImage(formData.imageFile);
+
+            const payload = { ...formData };
+            payload.image = imageResult; // Use the saved image data
+            delete payload.imageFile; // Remove the file object
+
+            // Convert numeric values
+            payload.requiredIngredients = payload.requiredIngredients.map(ing => ({
+                ...ing,
+                requiredAmountValue: Math.max(0, parseFloat(ing.requiredAmountValue) || 0)
+            }));
+
+            const data = await fetchApi("recipe/create", {
+                method: 'POST',
                 body: JSON.stringify(payload)
             });
-
-            const data = await res.json();
-
-            if (res.status >= 400) {
-                setAddRecipeCall({ state: "error", error: data });
-            } else {
-                setAddRecipeCall({ state: "success", data });
-                onComplete(data.recipe);
-                handleClose();
-            }
+            onComplete(data);
+            setFormData(defaultForm);
+            setValidated(false);
+            setAddRecipeShow(false);
+            setAddRecipeCall({ state: "inactive" });
         } catch (err) {
-            setAddRecipeCall({ state: "error", error: { errorMessage: err.message } });
+            console.error(err);
+            setAddRecipeCall({ state: "error", error: err });
         }
     };
 
     const handleNewRow = () => {
-        //create a new row by taking all required ingredients data and add a default object to them
         const updatedIngredients = [...formData.requiredIngredients, {
             id: "",
-            requiredAmountValue: null,
+            requiredAmountValue: "",
             requiredAmountUnit: "g"
         }];
-        //update the form with new row
-        setFormData((prevFormData) => ({
+        setFormData(prevFormData => ({
             ...prevFormData,
             requiredIngredients: updatedIngredients
         }));
-    }
+    }; const handleAmountUpdate = (e, idx) => {
+        const value = e.target.value;
+        if (value === '' || value === '-') {
+            const updatedIngredients = [...formData.requiredIngredients];
+            updatedIngredients[idx].requiredAmountValue = "";
+            setFormData(prev => ({ ...prev, requiredIngredients: updatedIngredients }));
+            return;
+        }
 
-    //function that removes duplicit code in onChange and onBlur events in amount value field
-    const handleAmountUpdate = (e, idx) => {
-        const updatedIngredients = [...formData.requiredIngredients];
-        updatedIngredients[idx].requiredAmountValue = parseFloat(e.target.value);
-        setFormData((prev) => ({ ...prev, requiredIngredients: updatedIngredients }));
-    }
+        const numValue = parseFloat(value);
+        if (!isNaN(numValue) && value.length <= 7) {
+            const updatedIngredients = [...formData.requiredIngredients];
+            updatedIngredients[idx].requiredAmountValue = numValue > 0 ? value : "";
+            setFormData(prev => ({ ...prev, requiredIngredients: updatedIngredients }));
+        }
+    };
 
     return (
-        <Modal show={show} onHide={handleClose}>
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                <Modal.Header>
-                    <Modal.Title>Create Recipe</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+        <Modal show={show} onHide={handleClose} centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Create recipe</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>Name<span style={{ color: "red" }}> *</span></Form.Label>
                         <Form.Control
@@ -128,9 +137,7 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                             value={formData.name}
                             onChange={(e) => {
                                 setField("name", e.target.value);
-                                const isDuplicate = recipeList.find(
-                                    (rec) => rec.name === e.target.value
-                                );
+                                const isDuplicate = recipeList.find(rec => rec.name === e.target.value);
                                 e.target.setCustomValidity(isDuplicate ? "Duplicate" : "");
                             }}
                             maxLength={20}
@@ -139,50 +146,63 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                         />
                         <Form.Control.Feedback type="invalid">
                             {validated && formData.name.length === 0 && "This field is required"}
-                            {validated && recipeList.find((rec) => rec.name === formData.name)
-                                && "This recipe already exists"}
+                            {validated && recipeList.find(rec => rec.name === formData.name) && "This recipe already exists"}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} className="mb-3">
+
+                    <Form.Group className="mb-3">
                         <Form.Label>Image<span style={{ color: "red" }}> *</span></Form.Label>
                         <div>
-                            <Button variant="success">
-                                <FileUpload
-                                    name="image"
-                                    mode="basic"
-                                    chooseLabel={formData.image || "Upload"}
-                                    url="http://localhost:8000/images"
-                                    accept="image/*"
-                                    maxFileSize={2000000}
-                                    auto={true}
-                                    onUpload={(e) => {
-                                        const response = e.xhr.response ? JSON.parse(e.xhr.response) : {};
-                                        if (response.filename) {
-                                            const file = e.files[0];
-                                            if (file) {
-                                                if (!file.type.startsWith("image/")) {
-                                                    setField("image", "");
-                                                    setInvalidFile(true);
-                                                } else {
-                                                    setField("image", response.filename);
-                                                    setInvalidFile(false);
-                                                }
-                                            }
+                            <Button variant="success">                                <FileUpload
+                                name="image"
+                                mode="basic" chooseLabel={formData.imageFile ? formData.imageFile.name : "Upload"}
+                                accept="image/*"
+                                maxFileSize={2000000}
+                                auto={true}
+                                customUpload={true}
+                                onSelect={async (e) => {
+                                    const file = e.files[0];
+                                    if (file) {
+                                        if (!file.type.startsWith("image/")) {
+                                            setField("imageFile", null);
+                                            setField("image", "");
+                                            setInvalidFile(true);
+                                        } else {
+                                            const imageResult = await imageService.saveImage(file);
+                                            setField("imageFile", file);
+                                            setField("image", imageResult);
+                                            setInvalidFile(false);
                                         }
-                                    }}
-                                />
+                                    }
+                                }}
+                            />
                             </Button>
                         </div>
-                        <div className="Invalid-feedback">
-                            {validated && !formData.image && "Please upload an image"}
-                        </div>
+                        {formData.image && (
+                            <div style={{ marginTop: '0.25rem' }}>
+                                <img
+                                    src={formData.image}
+                                    alt="Preview"
+                                    style={{ maxWidth: '100px', marginTop: '0.5rem' }}
+                                    onError={() => {
+                                        setField("imageFile", null);
+                                        setField("image", "");
+                                        setInvalidFile(true);
+                                    }}
+                                />
+                            </div>
+                        )}
+                        <Form.Control.Feedback type="invalid" style={{ display: (validated && !formData.imageFile) || invalidFile ? 'block' : 'none' }}>
+                            {validated && !formData.imageFile && "Please upload an image"}
+                            {invalidFile && "Please upload a valid image file"}
+                        </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} className="mb-3">
+
+                    <Form.Group className="mb-3">
                         <Form.Label>Preparation process<span style={{ color: "red" }}> *</span></Form.Label>
                         <Form.Control
                             as="textarea"
-                            name="preparationProcess"
-                            className="Preparation-container"
+                            style={{ minHeight: 100 }}
                             value={formData.preparationProcess}
                             onChange={(e) => setField("preparationProcess", e.target.value)}
                             maxLength={4000}
@@ -193,6 +213,7 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                             This field is required
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Required ingredients<span style={{ color: "red" }}> *</span></Form.Label>
                         <Row style={{ height: 32 }}>
@@ -319,29 +340,30 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                             </Button>
                         </div>
                     </Form.Group>
-                </Modal.Body>
-                <Modal.Footer>
-                    <div className="d-flex flex-row justify-content-between align-items-center w-100">
-                        <div>
-                            {addRecipeCall.state === "error" &&
-                                <div className="text-danger">Error: {addRecipeCall.error.errorMessage}</div>
-                            }
-                        </div>
-                        <div className="d-flex flex-row gap-2">
-                            <Button variant="secondary" onClick={handleClose}>
-                                Cancel
-                            </Button>
-                            <Button variant="primary" type="submit" disabled={addRecipeCall.state === "pending"}>
-                                {addRecipeCall.state === "pending" ? (
-                                    <Icon size={0.8} path={mdiLoading} spin={true} />
-                                ) : (
-                                    "Create"
+
+                    <Modal.Footer>
+                        <div className="d-flex flex-row justify-content-between align-items-center w-100">
+                            <div>
+                                {addRecipeCall.state === "error" && (
+                                    <div className="text-danger">Error: {addRecipeCall.error.message}</div>
                                 )}
-                            </Button>
+                            </div>
+                            <div className="d-flex flex-row gap-2">
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Cancel
+                                </Button>
+                                <Button variant="primary" type="submit" disabled={addRecipeCall.state === "pending"}>
+                                    {addRecipeCall.state === "pending" ? (
+                                        <Icon size={0.8} path={mdiLoading} spin={true} />
+                                    ) : (
+                                        "Create"
+                                    )}
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </Modal.Footer>
-            </Form>
+                    </Modal.Footer>
+                </Form>
+            </Modal.Body>
         </Modal>
     );
 }

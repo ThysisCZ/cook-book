@@ -8,7 +8,8 @@ import RecipeEditForm from '../bricks/recipeEditForm';
 
 function Recipe(props) {
     const ingredientList = props.ingredientListCall?.state === "success" ? props.ingredientListCall.data : [];
-    const imageUrl = `http://localhost:8000/images/${props.recipe.image}`;
+    // Image is already a data URL in both mobile and web environments
+    const imageUrl = props.recipe.image;
     const navigate = useNavigate(); const { recipeListCall, setRecipeListCall } = props;
     const [editRecipeShow, setEditRecipeShow] = useState(false);
 

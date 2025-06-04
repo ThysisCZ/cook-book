@@ -7,6 +7,7 @@ import { Outlet } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Icon from '@mdi/react';
 import { mdiMagnify, mdiLoading } from '@mdi/js';
+import { fetchApi } from '../services/api';
 
 function RecipeSection() {
     const { ingredientListCall } = useOutletContext();
@@ -23,21 +24,13 @@ function RecipeSection() {
 
     const ingredientList = useMemo(() => {
         return ingredientListCall.state === "success" ? ingredientListCall.data : [];
-    }, [ingredientListCall.state, ingredientListCall.data]);
-
-    useEffect(() => {
+    }, [ingredientListCall.state, ingredientListCall.data]); useEffect(() => {
         async function fetchRecipes() {
             setRecipeListCall({ state: "pending" });
 
             try {
-                const res = await fetch("http://localhost:8000/recipe/list");
-                const data = await res.json();
-
-                if (res.status >= 400) {
-                    setRecipeListCall({ state: "error", error: data });
-                } else {
-                    setRecipeListCall({ state: "success", data });
-                }
+                const data = await fetchApi("recipes/list");
+                setRecipeListCall({ state: "success", data });
             } catch (err) {
                 setRecipeListCall({ state: "error", error: err.message });
             }
@@ -121,7 +114,7 @@ function RecipeSection() {
                             <div>
                                 <Form.Control
                                     id="searchInput"
-                                    style={{ width: 192, height: 40 }}
+                                    style={{ width: 165, height: 40, fontSize: 13 }}
                                     maxLength={150}
                                     type="search"
                                     placeholder="Search by ingredients"
