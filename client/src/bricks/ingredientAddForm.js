@@ -129,11 +129,21 @@ function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientL
                                 }}
                                 required
                             >
-                                <option value="g">g</option>
-                                <option value="kg">kg</option>
-                                <option value="ml">ml</option>
-                                <option value="l">l</option>
-                                <option value="pcs">pcs</option>
+                                <option value={"ml"}>ml</option>
+                                <option value={"dl"}>dl</option>
+                                <option value={"l"}>l</option>
+                                <option value={"g"}>g</option>
+                                <option value={"dkg"}>dkg</option>
+                                <option value={"kg"}>kg</option>
+                                <option value={"tsp"}>tsp</option>
+                                <option value={"tbsp"}>tbsp</option>
+                                <option value={"fl oz"}>fl oz</option>
+                                <option value={"c"}>c</option>
+                                <option value={"pt"}>pt</option>
+                                <option value={"qt"}>qt</option>
+                                <option value={"gal"}>gal</option>
+                                <option value={"lb"}>lb</option>
+                                <option value={"oz"}>oz</option>
                             </Form.Select>
                         </Form.Group>
                     </Row>
