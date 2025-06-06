@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "io.ionic.recipemanager",
+  "applicationId": "com.thysis.recipe.manager",
   "variantName": "release",
   "elements": [
     {

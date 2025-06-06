@@ -1,5 +1,5 @@
 {
-    "appId": "io.ionic.recipemanager",
+    "appId": "com.thysis.recipe.manager",
     "appName": "Recipe Manager",
     "bundledWebRuntime": false,
     "npmClient": "npm",
