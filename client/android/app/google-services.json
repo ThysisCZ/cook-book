@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "381414044721",
+    "project_id": "recipe-manager-675b3",
+    "storage_bucket": "recipe-manager-675b3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381414044721:android:55018fa9db8415aa5b9110",
+        "android_client_info": {
+          "package_name": "com.thysis.recipe.manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDmwgD85ULRZbgyZhoCBWdhb6ppQkIUbA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-7702425271162224~9383008290"
+    }
+  ],
+  "configuration_version": "1"
+}

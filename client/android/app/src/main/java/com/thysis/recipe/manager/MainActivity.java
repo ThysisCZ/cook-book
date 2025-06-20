@@ -23,6 +23,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.initialization.AdapterStatus;
 import com.unity3d.ads.IUnityAdsInitializationListener;
 import com.unity3d.ads.UnityAds;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Locale;
 import java.util.Map;
@@ -32,10 +33,14 @@ public class MainActivity extends BridgeActivity {
     private AdView adView;
     private static final String UNITY_GAME_ID = "5878379";
     private static final boolean UNITY_TEST_MODE = false;
+    private FirebaseAnalytics analytics;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize Firebase Analytics
+        analytics = FirebaseAnalytics.getInstance(this);
 
         // Initialize Unity Ads
         UnityAds.initialize(this, UNITY_GAME_ID, UNITY_TEST_MODE, new IUnityAdsInitializationListener() {
