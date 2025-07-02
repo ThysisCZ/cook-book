@@ -117,6 +117,7 @@ function IngredientEditForm({ show, setEditIngredientShow, onComplete, ingredien
                                 <option value={"tsp"}>tsp</option>
                                 <option value={"tbsp"}>tbsp</option>
                                 <option value={"fl oz"}>fl oz</option>
+                                <option value={"pc"}>pc</option>
                                 <option value={"c"}>c</option>
                                 <option value={"pt"}>pt</option>
                                 <option value={"qt"}>qt</option>
