@@ -8,9 +8,10 @@ import RecipeEditForm from '../bricks/recipeEditForm';
 
 function Recipe(props) {
     const ingredientList = props.ingredientListCall?.state === "success" ? props.ingredientListCall.data : [];
+    const recipeList = props.recipeListCall?.state === "success" ? props.recipeListCall.data : [];
     // Image is already a data URL in both mobile and web environments
     const imageUrl = props.recipe.image;
-    const navigate = useNavigate(); const { recipeListCall, setRecipeListCall } = props;
+    const navigate = useNavigate();
     const [editRecipeShow, setEditRecipeShow] = useState(false);
 
     const handleEditRecipeShow = () => {
@@ -18,14 +19,14 @@ function Recipe(props) {
     };
 
     const handleRecipeEdited = (updatedRecipe) => {
-        if (recipeListCall?.state === "success") {
+        if (props.recipeListCall?.state === "success") {
             //find recipe that was updated and force a state update
-            const updatedList = [...recipeListCall.data];
+            const updatedList = [...recipeList];
             const index = updatedList.findIndex(rec => rec.id === updatedRecipe.id);
             if (index !== -1) {
                 updatedList[index] = updatedRecipe;
                 //display updated list with a new array reference to trigger re-render
-                setRecipeListCall({
+                props.setRecipeListCall({
                     state: "success",
                     data: updatedList
                 });
@@ -57,14 +58,16 @@ function Recipe(props) {
                             <img src={imageUrl} alt={props.recipe.image} className="Image-container"></img>
                         </div>
                         <div className="Align-left" style={{ marginBottom: 10 }}>
-                            <Button variant="success" onClick={() => navigate(`/recipe/${props.recipe.id}`)}>
+                            <Button
+                                variant="success"
+                                onClick={() => navigate(`/recipe/${props.recipe.id}`)}>
                                 Detail
                             </Button>
                         </div>
                     </div>
 
                     <div className="Align-left" style={{ fontWeight: "bold" }}>
-                        Ingredients:
+                        {props.isCzech ? "Ingredience:" : "Ingredients:"}
                     </div>
 
                     <div>
@@ -78,15 +81,19 @@ function Recipe(props) {
                                         {match.name}
                                     </div>
                                     <div className="Align-right">
-                                        {reqIng.requiredAmountValue} {reqIng.requiredAmountUnit} required
+                                        {props.isCzech ? "potřebujete " : ""}
+                                        {reqIng.requiredAmountValue} {reqIng.requiredAmountUnit}
+                                        {props.isCzech ? "" : " required"}
                                     </div>
                                     {match.amountValue !== 0 ? (
                                         <div className="Align-right">
-                                            {match.amountValue} {match.amountUnit} available
+                                            {props.isCzech ? "máte " : ""}
+                                            {match.amountValue} {match.amountUnit}
+                                            {props.isCzech ? "" : " available"}
                                         </div>
                                     ) : (
                                         <div className="Align-right">
-                                            unavailable
+                                            {props.isCzech ? "nedostupné" : "unavailable"}
                                         </div>
                                     )}
                                 </div>
@@ -100,8 +107,10 @@ function Recipe(props) {
                 show={editRecipeShow}
                 setEditRecipeShow={setEditRecipeShow}
                 onComplete={(recipe) => handleRecipeEdited(recipe)}
+                recipeListCall={props.recipeListCall}
                 ingredientListCall={props.ingredientListCall}
                 recipe={props.recipe}
+                isCzech={props.isCzech}
             />
         </>
     );

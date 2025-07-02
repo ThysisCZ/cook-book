@@ -4,6 +4,7 @@ import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
 import { Card, Button } from 'react-bootstrap';
 import { fetchApi } from '../services/api';
+import { useLanguage } from '../contexts/languageContext';
 
 function RecipeDetail() {
     const [recipeLoadCall, setRecipeLoadCall] = useState({
@@ -11,6 +12,7 @@ function RecipeDetail() {
     });
     const { id } = useParams();
     const navigate = useNavigate();
+    const { isCzech } = useLanguage();
 
     useEffect(() => {
         async function loadRecipe() {
@@ -43,7 +45,7 @@ function RecipeDetail() {
                                 <h1 className="Align-center">
                                     {recipeLoadCall.data.name}
                                 </h1>
-                                <h3>Preparation process:</h3>
+                                {isCzech ? <h3>Postup:</h3> : <h3>Preparation process:</h3>}
                                 <p style={{ textAlign: "justify" }}>
                                     {recipeLoadCall.data.preparationProcess}
                                 </p>
@@ -52,7 +54,7 @@ function RecipeDetail() {
 
                         <div className="Show-form-button" style={{ margin: 16 }}>
                             <Button variant="success" onClick={() => navigate("/recipeSection")}>
-                                Return
+                                {isCzech ? "Zpět" : "Return"}
                             </Button>
                         </div>
                     </>
@@ -60,7 +62,8 @@ function RecipeDetail() {
             case "error":
                 return (
                     <div>
-                        <h3>Failed to load recipe data.</h3>
+                        {isCzech ? <h3>Nepodařilo se načíst data receptu.</h3> :
+                            <h3>Failed to load recipe data.</h3>}
                         <pre>{JSON.stringify(recipeLoadCall.error, null, 2)}</pre>
                     </div>
                 );

@@ -4,7 +4,7 @@ import { mdiLoading } from '@mdi/js';
 import { useState } from 'react';
 import { fetchApi } from '../services/api';
 
-function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientListCall }) {
+function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientListCall, isCzech }) {
     const defaultForm = {
         name: "",
         amountValue: "", // Changed from null to empty string
@@ -67,11 +67,16 @@ function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientL
         <Modal show={show} onHide={handleClose}>
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Modal.Header>
-                    <Modal.Title>Create Ingredient</Modal.Title>
+                    <Modal.Title>
+                        {isCzech ? "Vytvořit Ingredienci" : "Create Ingredient"}
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
-                        <Form.Label>Name<span style={{ color: "red" }}> *</span></Form.Label>
+                        <Form.Label>
+                            {isCzech ? "Název" : "Name"}
+                            <span style={{ color: "red" }}> *</span>
+                        </Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.name}
@@ -90,14 +95,17 @@ function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientL
                             }
                         />
                         <Form.Control.Feedback type="invalid">
-                            {validated && formData.name.length === 0 && "This field is required"}
+                            {validated && formData.name.length === 0 && (isCzech ? "Toto pole je povinné" : "This field is required")}
                             {validated && ingredientList.find((ing) => ing.name.toLowerCase() === formData.name.toLowerCase())
-                                && "This ingredient already exists"}
+                                && (isCzech ? "Tato ingredience již existuje" : "This ingredient already exists")}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Row>
                         <Form.Group as={Col} className="mb-3">
-                            <Form.Label>Amount value<span style={{ color: "red" }}> *</span></Form.Label>
+                            <Form.Label>
+                                {isCzech ? "Hodnota" : "Value"}
+                                <span style={{ color: "red" }}> *</span>
+                            </Form.Label>
                             <Form.Control
                                 type="number"
                                 value={formData.amountValue}
@@ -109,19 +117,21 @@ function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientL
                                         setField("amountValue", parseFloat(e.target.value));
                                     }
                                 }}
-                                min={0.001}
+                                min={0}
                                 step={0.001}
                                 required
-                                isInvalid={validated && formData.amountValue < 0.001}
+                                isInvalid={validated && formData.amountValue < 0}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Input a valid number
+                                {isCzech ? "Zadejte validní číslo" : "Input a valid number"}
                                 <br></br>
-                                (0,001—9999999)
+                                (0—9999999)
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group as={Col} className="mb-3">
-                            <Form.Label>Unit<span style={{ color: "red" }}> *</span></Form.Label>
+                            <Form.Label>
+                                {isCzech ? "Jednotka" : "Unit"}
+                                <span style={{ color: "red" }}> *</span></Form.Label>
                             <Form.Select
                                 value={formData.amountUnit}
                                 onChange={(e) => {
@@ -135,11 +145,19 @@ function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientL
                                 <option value={"g"}>g</option>
                                 <option value={"dkg"}>dkg</option>
                                 <option value={"kg"}>kg</option>
-                                <option value={"tsp"}>tsp</option>
-                                <option value={"tbsp"}>tbsp</option>
+                                <option value={"tsp/ČL"}>
+                                    {isCzech ? "ČL" : "tsp"}
+                                </option>
+                                <option value={"tbsp/PL"}>
+                                    {isCzech ? "PL" : "tsp"}
+                                </option>
                                 <option value={"fl oz"}>fl oz</option>
-                                <option value={"pc"}>pc</option>
-                                <option value={"c"}>c</option>
+                                <option value={"pc/ks"}>
+                                    {isCzech ? "ks" : "pc"}
+                                </option>
+                                <option value={"c/hrn"}>
+                                    {isCzech ? "hrn" : "c"}
+                                </option>
                                 <option value={"pt"}>pt</option>
                                 <option value={"qt"}>qt</option>
                                 <option value={"gal"}>gal</option>
@@ -160,7 +178,7 @@ function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientL
                         </div>
                         <div>
                             <Button variant="secondary" onClick={handleClose} className="me-2">
-                                Cancel
+                                {isCzech ? "Zrušit" : "Cancel"}
                             </Button>
                             <Button
                                 variant="primary"
@@ -170,7 +188,7 @@ function IngredientAddForm({ show, setAddIngredientShow, onComplete, ingredientL
                                 {addIngredientCall.state === "pending" ? (
                                     <Icon size={0.8} path={mdiLoading} spin={true} />
                                 ) : (
-                                    "Create"
+                                    isCzech ? "Vytvořit" : "Create"
                                 )}
                             </Button>
                         </div>

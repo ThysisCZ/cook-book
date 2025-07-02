@@ -5,9 +5,11 @@ import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
+import { useLanguage } from '../contexts/languageContext';
 
 function IngredientSection() {
     const { ingredientListCall, setIngredientListCall } = useOutletContext();
+    const { isCzech } = useLanguage();
     const [addIngredientShow, setAddIngredientShow] = useState(false);
 
     const handleAddIngredientShow = () => {
@@ -27,7 +29,7 @@ function IngredientSection() {
         <>
             <div className="Show-form-button">
                 <Button variant="success" onClick={handleAddIngredientShow}>
-                    Create
+                    {isCzech ? "Vytvořit" : "Create"}
                 </Button>
             </div>
             <div>
@@ -38,10 +40,13 @@ function IngredientSection() {
                     <p>{ingredientListCall.error}</p>
                 )}
                 {ingredientListCall.state === "success" && ingredientListCall.data.length > 0 && (
-                    <IngredientList ingredientList={ingredientListCall.data} />
+                    <IngredientList
+                        ingredientList={ingredientListCall.data}
+                        isCzech={isCzech}
+                    />
                 )}
                 {ingredientListCall.state === "success" && ingredientListCall.data.length === 0 && (
-                    <p>There are no ingredients.</p>
+                    isCzech ? <p>Nejsou tu žádné ingredience.</p> : <p>There are no ingredients.</p>
                 )}
             </div>
 
@@ -51,6 +56,7 @@ function IngredientSection() {
                 onComplete={(ingredient) => handleIngredientAdded(ingredient)}
                 ingredientListCall={ingredientListCall}
                 setIngredientListCall={setIngredientListCall}
+                isCzech={isCzech}
             />
         </>
     );

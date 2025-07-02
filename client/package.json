@@ -16,16 +16,16 @@
     "axios": "^1.9.0",
     "bootstrap": "^5.3.5",
     "crypto-js": "^4.2.0",
-    "fileupload": "^1.0.0",
+    "fileupload": "^0.2.1",
     "mdi-js": "^1.0.1",
     "mdi-react": "^9.4.0",
     "primereact": "^10.9.5",
     "react": "^19.1.0",
     "react-admin": "^5.7.4",
     "react-bootstrap": "^2.10.9",
+    "react-country-flag": "^3.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.5.0",
-    "react-scripts": "5.0.1",
     "toast": "^0.5.4",
     "uuid": "^11.1.0",
     "web-vitals": "^2.1.4"
@@ -55,6 +55,7 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.2.0"
+    "@capacitor/cli": "^7.2.0",
+    "react-scripts": "^5.0.1"
   }
 }

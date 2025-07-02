@@ -53,7 +53,8 @@ function Ingredient(props) {
                     </div>
 
                     <div>
-                        Amount: {" "} {props.ingredient.amountValue} {" "}
+                        {props.isCzech ? "Množství: " : "Amount: "}
+                        {props.ingredient.amountValue} {" "}
                         {props.ingredient.amountUnit}
                     </div>
                 </Card.Body>
@@ -64,6 +65,8 @@ function Ingredient(props) {
                 setEditIngredientShow={setEditIngredientShow}
                 onComplete={(ingredient) => handleIngredientEdited(ingredient)}
                 ingredient={props.ingredient}
+                ingredientListCall={ingredientListCall}
+                isCzech={props.isCzech}
             />
         </>
     )

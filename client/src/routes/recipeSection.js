@@ -8,9 +8,11 @@ import Form from 'react-bootstrap/Form';
 import Icon from '@mdi/react';
 import { mdiMagnify, mdiLoading } from '@mdi/js';
 import { fetchApi } from '../services/api';
+import { useLanguage } from '../contexts/languageContext';
 
 function RecipeSection() {
     const { ingredientListCall } = useOutletContext();
+    const { isCzech } = useLanguage();
     const [recipeListCall, setRecipeListCall] = useState({ state: "pending" });
     const [addRecipeShow, setAddRecipeShow] = useState(false);
     //state that triggers an event in recipe list lifecycle after change
@@ -117,7 +119,7 @@ function RecipeSection() {
                                     style={{ width: 165, height: 40, fontSize: 13 }}
                                     maxLength={150}
                                     type="search"
-                                    placeholder="Search by ingredients"
+                                    placeholder={isCzech ? "Hledat dle ingrediencí" : "Search by ingredients"}
                                     aria-label="Search"
                                     onChange={handleSearchDelete}
                                 />
@@ -135,7 +137,7 @@ function RecipeSection() {
                 </div>
                 <div className="Show-form-button">
                     <Button variant="success" onClick={handleAddRecipeShow}>
-                        Create
+                        {isCzech ? "Vytvořit" : "Create"}
                     </Button>
                 </div>
             </div>
@@ -151,13 +153,14 @@ function RecipeSection() {
                         ingredientListCall={ingredientListCall}
                         recipeListCall={recipeListCall}
                         setRecipeListCall={setRecipeListCall}
+                        isCzech={isCzech}
                     />
                 )}
                 {recipeListCall.state === "success" && recipeListCall.data.length === 0 && (
-                    <p>There are no recipes.</p>
+                    isCzech ? <p>Nejsou tu žádné recepty.</p> : <p>There are no recipes.</p>
                 )}
                 {notFound && recipeListCall.state === "success" && recipeListCall.data.length > 0 && (
-                    <p>No recipes found.</p>
+                    isCzech ? <p>Nebylo nic nalezeno.</p> : <p>No recipes found.</p>
                 )}
             </div>
 
@@ -167,6 +170,7 @@ function RecipeSection() {
                 onComplete={(recipe) => handleRecipeAdded(recipe)}
                 recipeListCall={recipeListCall}
                 ingredientListCall={ingredientListCall}
+                isCzech={isCzech}
             />
 
             <Outlet />

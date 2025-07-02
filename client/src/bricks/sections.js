@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { fetchApi } from '../services/api';
 
-function Sections() {
+function Sections(props) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -27,6 +27,8 @@ function Sections() {
         fetchIngredients();
     }, []);
 
+    const isCzech = props.isCzech;
+
     return (
         <Accordion activeKey={activeSection}>
             <Accordion.Item eventKey="recipes">
@@ -39,12 +41,12 @@ function Sections() {
                         }
                     }}>
                     <div style={{ fontWeight: "bold" }}>
-                        Recipes
+                        {isCzech ? "Recepty" : "Recipes"}
                     </div>
                 </Accordion.Header>
                 {activeSection === "recipes" && (
                     <Accordion.Body>
-                        <Outlet context={{ ingredientListCall }} />
+                        <Outlet context={{ ingredientListCall, isCzech }} />
                     </Accordion.Body>
                 )}
             </Accordion.Item>
@@ -58,12 +60,12 @@ function Sections() {
                         }
                     }}>
                     <div style={{ fontWeight: "bold" }}>
-                        Ingredients
+                        {isCzech ? "Ingredience" : "Ingredients"}
                     </div>
                 </Accordion.Header>
                 {activeSection === "ingredients" && (
                     <Accordion.Body>
-                        <Outlet context={{ ingredientListCall, setIngredientListCall }} />
+                        <Outlet context={{ ingredientListCall, setIngredientListCall, isCzech }} />
                     </Accordion.Body>
                 )}
             </Accordion.Item>

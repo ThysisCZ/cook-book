@@ -15,6 +15,7 @@ function RecipeList(props) {
                             ingredientListCall={props.ingredientListCall}
                             recipeListCall={props.recipeListCall}
                             setRecipeListCall={props.setRecipeListCall}
+                            isCzech={props.isCzech}
                         />
                     </div>
                 );

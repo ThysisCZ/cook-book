@@ -6,7 +6,7 @@ import { fetchApi } from '../services/api';
 import { FileUpload } from 'primereact/fileupload';
 import { imageService } from '../services/ImageService';
 
-function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCall, recipe }) {
+function RecipeEditForm({ show, setEditRecipeShow, onComplete, recipeListCall, ingredientListCall, recipe, isCzech }) {
     const defaultForm = {
         name: "",
         image: "",
@@ -27,6 +27,7 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
     const [duplicateIngredients, setDuplicateIngredients] = useState([]);
     const fileUploadRef = useRef(null);
 
+    const recipeList = recipeListCall.state === "success" ? recipeListCall.data : [];
     const ingredientList = ingredientListCall.state === "success" ? ingredientListCall.data : [];
 
     // Update form data when recipe changes or modal is shown
@@ -140,38 +141,48 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
     }
 
     return (
-        <Modal
-            show={show}
-            onHide={handleClose}
-            centered>
+        <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Edit recipe</Modal.Title>
+                <Modal.Title>
+                    {isCzech ? "Upravit Recept" : "Edit Recipe"}
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Name<span style={{ color: "red" }}> *</span></Form.Label>
+                        <Form.Label>
+                            {isCzech ? "Název" : "Name"}
+                            <span style={{ color: "red" }}> *</span>
+                        </Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.name}
-                            onChange={(e) => setField("name", e.target.value)}
+                            onChange={(e) => {
+                                setField("name", e.target.value);
+                                const isDuplicate = recipeList.find(rec => rec.name === e.target.value);
+                                e.target.setCustomValidity(isDuplicate ? "Duplicate" : "");
+                            }}
                             maxLength={20}
                             required
                             isInvalid={validated && formData.name.length === 0}
                         />
                         <Form.Control.Feedback type="invalid">
-                            {validated && formData.name.length === 0 && "This field is required"}
+                            {validated && formData.name.length === 0 && (isCzech ? "Toto pole je povinné" : "This field is required")}
+                            {validated && recipeList.find(rec => rec.name === formData.name) && (isCzech ? "Tento recept již existuje" : "This recipe already exists")}
                         </Form.Control.Feedback>
                     </Form.Group>
 
-                    <Form.Group as={Col} className="mb-3">
-                        <Form.Label>Image<span style={{ color: "red" }}> *</span></Form.Label>
+                    <Form.Group className="mb-3">
+                        <Form.Label>
+                            {isCzech ? "Obrázek" : "Image"}
+                            <span style={{ color: "red" }}> *</span>
+                        </Form.Label>
                         <div>
                             <Button variant="success">
                                 <FileUpload
                                     ref={fileUploadRef}
-                                    mode="basic"
-                                    chooseLabel={formData.imageFile ? formData.imageFile.name : "Upload"}
+                                    name="image"
+                                    mode="advanced" chooseLabel={formData.imageFile ? formData.imageFile.name : isCzech ? "Nahrát" : "Upload"}
                                     accept="image/*"
                                     maxFileSize={2000000}
                                     auto={true}
@@ -208,14 +219,17 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                                 />
                             </div>
                         )}
-                        <Form.Control.Feedback type="invalid" style={{ display: (validated && !formData.image) || invalidFile ? 'block' : 'none' }}>
-                            {validated && !formData.image && "Please upload an image"}
-                            {invalidFile && "Please upload a valid image file"}
+                        <Form.Control.Feedback type="invalid" style={{ display: (validated && !formData.imageFile) || invalidFile ? 'block' : 'none' }}>
+                            {validated && !formData.imageFile && !invalidFile && (isCzech ? "Prosím, nahrajte obrázek" : "Please upload an image")}
+                            {validated && invalidFile && (isCzech ? "Prosím, nahrajte validní formát" : "Please upload a valid file format")}
                         </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Preparation process<span style={{ color: "red" }}> *</span></Form.Label>
+                        <Form.Label>
+                            {isCzech ? "Postup" : "Preparation process"}
+                            <span style={{ color: "red" }}> *</span>
+                        </Form.Label>
                         <Form.Control
                             as="textarea"
                             style={{ minHeight: 100 }}
@@ -226,28 +240,34 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                             isInvalid={validated && formData.preparationProcess.length === 0}
                         />
                         <Form.Control.Feedback type="invalid">
-                            This field is required
+                            {isCzech ? "Toto pole je povinné" : "This field is required"}
                         </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group as={Col} className="mb-3">
-                        <Form.Label>Required ingredients<span style={{ color: "red" }}> *</span></Form.Label>
+                        <Form.Label>
+                            {isCzech ? "Potřebné ingredience" : "Required ingredients"}
+                            <span style={{ color: "red" }}> *</span>
+                        </Form.Label>
                         <Row style={{ height: 32 }}>
                             <Form.Group as={Col} className="mb-3">
                                 <Form.Label>
-                                    Name<span style={{ color: "red" }}> *</span>
+                                    {isCzech ? "Název" : "Name"}
+                                    <span style={{ color: "red" }}> *</span>
                                 </Form.Label>
                             </Form.Group>
 
                             <Form.Group as={Col} className="mb-3">
                                 <Form.Label>
-                                    Value<span style={{ color: "red" }}> *</span>
+                                    {isCzech ? "Hodnota" : "Value"}
+                                    <span style={{ color: "red" }}> *</span>
                                 </Form.Label>
                             </Form.Group>
 
                             <Form.Group as={Col} className="mb-3">
                                 <Form.Label>
-                                    Unit<span style={{ color: "red" }}> *</span>
+                                    {isCzech ? "Jednotka" : "Unit"}
+                                    <span style={{ color: "red" }}> *</span>
                                 </Form.Label>
                             </Form.Group>
                         </Row>
@@ -272,7 +292,9 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                                         required
                                         isInvalid={validated && !formData.requiredIngredients[idx].id}
                                     >
-                                        <option value={""}>Select an ingredient</option>
+                                        <option value={""}>
+                                            {isCzech ? "Vyberte ingredienci" : "Select an ingredient"}
+                                        </option>
 
                                         {ingredientList.map((ing) => {
                                             const name = ing.name;
@@ -284,8 +306,8 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                                         })}
                                     </Form.Select>
                                     <Form.Control.Feedback type="invalid">
-                                        {validated && !formData.requiredIngredients[idx].id && "No ingredient selected"}
-                                        {validated && formData.requiredIngredients[idx].id && duplicateIngredients.includes(idx) && "Duplicate ingredient"}
+                                        {validated && !formData.requiredIngredients[idx].id && (isCzech ? "Nevybrali jste ingredienci" : "No ingredient selected")}
+                                        {validated && formData.requiredIngredients[idx].id && duplicateIngredients.includes(idx) && (isCzech ? "Duplicitní ingredience" : "Duplicit ingredient")}
                                     </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group as={Col} className="mb-3">
@@ -312,7 +334,7 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                                         isInvalid={validated && !formData.requiredIngredients[idx].requiredAmountValue}
                                     />
                                     <Form.Control.Feedback type="invalid">
-                                        Input a valid number
+                                        {isCzech ? "Zadejte validní číslo" : "Input a valid number"}
                                         <br></br>
                                         (0,001—9999999)
                                     </Form.Control.Feedback>
@@ -334,26 +356,31 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                                         <option value={"g"}>g</option>
                                         <option value={"dkg"}>dkg</option>
                                         <option value={"kg"}>kg</option>
-                                        <option value={"tsp"}>tsp</option>
-                                        <option value={"tbsp"}>tbsp</option>
+                                        <option value={"tsp"}>
+                                            {isCzech ? "ČL" : "tsp"}
+                                        </option>
+                                        <option value={"tbsp"}>
+                                            {isCzech ? "PL" : "tsp"}
+                                        </option>
                                         <option value={"fl oz"}>fl oz</option>
-                                        <option value={"pc"}>pc</option>
-                                        <option value={"c"}>c</option>
+                                        <option value={"pc"}>
+                                            {isCzech ? "ks" : "pc"}
+                                        </option>
+                                        <option value={"c"}>
+                                            {isCzech ? "hrn" : "c"}
+                                        </option>
                                         <option value={"pt"}>pt</option>
                                         <option value={"qt"}>qt</option>
                                         <option value={"gal"}>gal</option>
                                         <option value={"lb"}>lb</option>
                                         <option value={"oz"}>oz</option>
                                     </Form.Select>
-                                    <Form.Control.Feedback type="invalid">
-                                        This field is required
-                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Row>
                         ))}
                         <div className="Align-center">
                             <Button variant="success" onClick={handleNewRow} >
-                                New ingredient
+                                {isCzech ? "Nová ingredience" : "New ingredient"}
                             </Button>
                         </div>
                     </Form.Group>
@@ -367,13 +394,13 @@ function RecipeEditForm({ show, setEditRecipeShow, onComplete, ingredientListCal
                             </div>
                             <div className="d-flex flex-row gap-2">
                                 <Button variant="secondary" onClick={handleClose}>
-                                    Cancel
+                                    {isCzech ? "Zrušit" : "Cancel"}
                                 </Button>
                                 <Button variant="primary" type="submit" disabled={editRecipeCall.state === "pending"}>
                                     {editRecipeCall.state === "pending" ? (
                                         <Icon size={0.8} path={mdiLoading} spin={true} />
                                     ) : (
-                                        "Save"
+                                        isCzech ? "Uložit" : "Save"
                                     )}
                                 </Button>
                             </div>

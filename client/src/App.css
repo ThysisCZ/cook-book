@@ -7,7 +7,6 @@
   color: rgb(16, 0, 140);
   display: flex;
   flex-direction: column;
-  align-items: center;
   font-size: calc(10px + 3vmin);
   font-weight: bold;
   padding: 10px;
