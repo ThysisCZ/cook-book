@@ -26,6 +26,7 @@
     "react-country-flag": "^3.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.5.0",
+    "react-world-flags": "^1.6.0",
     "toast": "^0.5.4",
     "uuid": "^11.1.0",
     "web-vitals": "^2.1.4"

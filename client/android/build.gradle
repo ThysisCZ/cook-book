@@ -24,6 +24,29 @@ allprojects {
     }
 }
 
+// Configure Kotlin without importing the class
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+            }
+        }
+
+        // Configure Kotlin JVM target safely
+        project.tasks.configureEach { task ->
+            if (task.name.contains('Kotlin') && task.hasProperty('kotlinOptions')) {
+                task.kotlinOptions {
+                    jvmTarget = "17"
+                }
+            }
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
