@@ -106,7 +106,26 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
             ...prevFormData,
             requiredIngredients: updatedIngredients
         }));
-    }; const handleAmountUpdate = (e, idx) => {
+    };
+
+    const handleUndoRow = () => {
+        let updatedIngredients = [...formData.requiredIngredients].slice(0, -1);
+
+        if (updatedIngredients.length < 1) {
+            updatedIngredients = [{
+                id: "",
+                requiredAmountValue: "",
+                requiredAmountUnit: "g"
+            }]
+        }
+
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            requiredIngredients: updatedIngredients
+        }));
+    };
+
+    const handleAmountUpdate = (e, idx) => {
         const value = e.target.value;
         if (value === '' || value === '-') {
             const updatedIngredients = [...formData.requiredIngredients];
@@ -360,10 +379,17 @@ function RecipeAddForm({ show, setAddRecipeShow, onComplete, recipeListCall, ing
                                 </Form.Group>
                             </Row>
                         ))}
-                        <div className="Align-center">
-                            <Button variant="success" onClick={handleNewRow} >
-                                {isCzech ? "Nová ingredience" : "New ingredient"}
-                            </Button>
+                        <div className="d-flex justify-content-center">
+                            <div>
+                                <Button variant="success" style={{ marginRight: 4 }} onClick={handleNewRow} >
+                                    {isCzech ? "Nová ingredience" : "New ingredient"}
+                                </Button>
+                            </div>
+                            <div>
+                                <Button variant="danger" style={{ marginLeft: 4 }} onClick={handleUndoRow} >
+                                    {isCzech ? "Zpět" : "Undo"}
+                                </Button>
+                            </div>
                         </div>
                     </Form.Group>
 
